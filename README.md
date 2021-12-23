@@ -2,7 +2,7 @@
 
 ```
 npm i
-node ./server.js
+node server/server.js
 ```
 
 Open `localhost:3000`
