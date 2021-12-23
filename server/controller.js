@@ -10,6 +10,7 @@ export default class Controller
 	{
 	}
 
+	/// Handles commands from clients
 	async handleCommand(ws, data)
 	{
 		console.log('Handling command: %s', data);

@@ -26,7 +26,7 @@ export default class View
 	setActive(playerId)
 	{
 		for(const [id, $player] of Object.entries(this.#playerRows))
-			$player.classList.toggle('active', id == playerId);		
+			$player.querySelector('.js-actor').textContent = id == playerId;		
 	}
 
 	handsDealt(hands)
@@ -45,6 +45,9 @@ export default class View
 				// someone elses hand
 				this.#playerRows[hand.playerId].querySelector('.js-cards').textContent = hand.cardsRemaining;
 			}
+
+			if(hand.eldest)
+				this.setActive(hand.playerId);
 		}
 	}
 }

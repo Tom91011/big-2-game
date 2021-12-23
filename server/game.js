@@ -39,7 +39,7 @@ export default class Game
 		// TODO: prevent double dealing
 
 		let deck = this.#buildDeck(numJokers);
-		let hands = this.#dealDeck(deck);
+		let hands = this.#dealDeck(deck, dealerPlayerId);
 		return Promise.resolve(hands);
 	}
 
@@ -66,14 +66,18 @@ export default class Game
 		let playersArray = Object.values(this.#players)
 
 		// find/choose dealer
-		let dealer = null;
+		let eldest = null;
 		if(!dealerPlayerId)
-			dealer = Math.floor(Math.random() * playersArray.length)
+			eldest = Math.floor(Math.random() * playersArray.length)
 		else
-			dealer = playersArray.findIndex(player => player.id == dealerPlayerId);
+		{
+			eldest = playersArray.findIndex(player => player.id == dealerPlayerId) + 1;
+			if(eldest == playersArray.length)
+				eldest = 0;
+		}
 
 		// deal
-		let p = dealer;
+		let p = eldest;
 		while(deck.length > 0)
 		{
 			let card = deck.pop();
@@ -84,10 +88,10 @@ export default class Game
 		}
 
 		// return players' hands
-		return playersArray.map(p => ({
+		return playersArray.map((p, i) => ({
 			playerId: p.id,
 			hand: p.hand,
-			eldest: dealer == playersArray - 1 ? 0 : dealer
+			eldest: i == eldest
 		}));
 	}
 
