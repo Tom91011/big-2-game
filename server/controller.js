@@ -12,6 +12,8 @@ export default class Controller
 
 	async handleCommand(ws, data)
 	{
+		console.log('Handling command: %s', data);
+
 		// TODO: make sure the client reconnects properly
 		this.#playerSockets[data.playerId] = ws;
 
