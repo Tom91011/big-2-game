@@ -12,7 +12,6 @@ export default class ClientController
 		this.#socket = socket;
 		this.#playerId = new Date().getTime();
 
-		// attach acknowledgement listener
 		this.#socket.addEventListener('message', message => {
 			let value = JSON.parse(message.data);
 			console.log('Received: ');

@@ -35,6 +35,11 @@ export default class Controller
 				await this.#deal(data.gameId, data.numJokers, data.dealerPlayerId);
 				await this.#acknowledge(data.playerId, data.messageId);
 				break;
+
+			case 'play-hand':
+				await this.#playHand(data.gameId, data.playerId, data.hand);
+				await this.#acknowledge(data.playerId, data.messageId);
+
 		}
 	}
 
@@ -70,30 +75,36 @@ export default class Controller
 	async #deal(gameId, numJokers, dealerPlayerId = null)
 	{
 		let game = this.#games[gameId];
-		game.deal(numJokers, dealerPlayerId)
-			.then(hands => {
-				for(var h = 0; h < hands.length; h++)
-				{
-					let handsView = hands.map(hand => {
-						if(hand.playerId == hands[h].playerId)
-							return hand;
+		let hands = await game.deal(numJokers, dealerPlayerId);
+		for(var h = 0; h < hands.length; h++)
+		{
+			// give each player their respective view of what everyone's hand looks like
+			let handsView = hands.map(hand => {
+				// your own hand
+				if(hand.playerId == hands[h].playerId)
+					return hand;
 
-						return {
-							playerId: hand.playerId,
-							cardsRemaining: hand.hand.length,
-							eldest: hand.eldest
-						}
-					})
-
-					let playerWs = this.#playerSockets[hands[h].playerId];
-					this.#send(playerWs, {
-						type: 'hands-dealt',
-						payload: handsView
-					})
+				// someone elses hand
+				return {
+					playerId: hand.playerId,
+					cardsRemaining: hand.hand.length,
+					eldest: hand.eldest
 				}
 			})
+
+			let playerWs = this.#playerSockets[hands[h].playerId];
+			this.#send(playerWs, {
+				type: 'hands-dealt',
+				payload: handsView
+			})
+		}
 	}
 
+	/// Handles a player playing a hand
+	async #playHand(gameId, playerId, hand)
+	{
+		// TODO: validate hand, remove cards from current user's hand, send played hand to all players, update player to all players
+	}
 
 	/// Sends the given data via the given websocket
 	#send(ws, data)
