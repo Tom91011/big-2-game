@@ -3,11 +3,21 @@ export default class View
 	#playerRows = {};
 	#playerId = null;
 
+	onPlayHand = () => {};
+
 	constructor($container)
 	{
 		this.$playerTableBody = $container.querySelector('.js-players tbody');
 		this.$playerRowTemplate = this.$playerTableBody.querySelector('.js-template');
 		this.$playerRowTemplate.parentElement.removeChild(this.$playerRowTemplate);
+
+		this.$table = $container.querySelector('.js-table')
+
+		$container.querySelector('.js-play').addEventListener('click', e => {
+			e.preventDefault();
+			let cards = ['10S', 'JS', 'QS', 'KS', '2S'];
+			this.onPlayHand(cards);
+		}, false);
 	}
 
 	addPlayer(player, isCurrentPlayer)
@@ -49,5 +59,10 @@ export default class View
 			if(hand.eldest)
 				this.setActive(hand.playerId);
 		}
+	}
+
+	handPlayed(hand)
+	{
+		this.$table.textContent = hand.cards.join(', ');
 	}
 }

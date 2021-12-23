@@ -5,6 +5,7 @@ export default class ClientController
 	#ackCallbacks = {};
 	#socket = null;
 	#playerId = null;
+	#gameId = null;
 	#view = null;
 
 	constructor(socket, view)
@@ -25,9 +26,18 @@ export default class ClientController
 
 			else if(value.type == 'hands-dealt')
 				this.handsDealt(value.payload);
+
+			else if(value.type == 'hand-played')
+				this.handPlayed(value.payload);
 		});
 
 		this.#view = view;
+		this.attachViewListeners();
+	}
+
+	attachViewListeners()
+	{
+		this.#view.onPlayHand = cards => this.playHand(cards);
 	}
 
 	async playerJoined(player)
@@ -44,6 +54,7 @@ export default class ClientController
 			playerId: this.#playerId
 		});
 
+		this.#gameId = id;
 		return {id, name};
 	}
 
@@ -52,6 +63,22 @@ export default class ClientController
 		this.#view.handsDealt(hands);
 		
 	}
+
+	async playHand(cards)
+	{
+		let ack = await this.#send({
+			command: 'play-hand',
+			gameId: this.#gameId,
+			playerId: this.#playerId,
+			cards: cards
+		})
+	}
+
+	async handPlayed(hand)
+	{
+		this.#view.handPlayed(hand);
+	}
+
 
 	deal(gameId)
 	{
@@ -62,13 +89,15 @@ export default class ClientController
 		})
 	}
 
-	joinGame(gameId)
+	async joinGame(gameId)
 	{
-		return this.#send({
+		let ack = await this.#send({
 			command: 'join',
 			playerId: this.#playerId,
 			gameId
 		});
+
+		this.gameId = gameId;
 	}
 
 	#send(json)

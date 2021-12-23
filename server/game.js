@@ -95,8 +95,18 @@ export default class Game
 		}));
 	}
 
-	playHand(playerId, hand)
+	playHand(playerId, cards)
 	{
+		let player = this.#players[playerId];
+		
+		for(var c = 0; c < cards.length; c++)
+			player.hand.splice(player.hand.findIndex(card => card == cards[c]), 1)
 
+		let playedHand = {
+			playerId,
+			cards
+		};
+		this.#playedHands.push(playedHand);
+		return playedHand;
 	}
 }

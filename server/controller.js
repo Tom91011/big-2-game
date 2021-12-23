@@ -37,7 +37,7 @@ export default class Controller
 				break;
 
 			case 'play-hand':
-				await this.#playHand(data.gameId, data.playerId, data.hand);
+				await this.#playHand(data.gameId, data.playerId, data.cards);
 				await this.#acknowledge(data.playerId, data.messageId);
 
 		}
@@ -101,9 +101,22 @@ export default class Controller
 	}
 
 	/// Handles a player playing a hand
-	async #playHand(gameId, playerId, hand)
+	async #playHand(gameId, playerId, cards)
 	{
 		// TODO: validate hand, remove cards from current user's hand, send played hand to all players, update player to all players
+
+		let game = this.#games[gameId];
+		let playedHand = game.playHand(playerId, cards);
+
+		this.#notifyPlayers({
+			type: 'player-updated',
+			payload: { }// todo: implement me
+		})
+
+		this.#notifyPlayers({
+			type: 'hand-played',
+			payload: playedHand
+		})
 	}
 
 	/// Sends the given data via the given websocket
