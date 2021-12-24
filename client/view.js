@@ -33,32 +33,33 @@ export default class View
 			this.#playerId = player.id;
 	}
 
-	setActive(playerId)
+	setCurrentPlayer(playerId)
 	{
 		for(const [id, $player] of Object.entries(this.#playerRows))
 			$player.querySelector('.js-actor').textContent = id == playerId;		
 	}
 
-	handsDealt(hands)
+	handsUpdated(hands)
 	{
 		for(var h = 0; h < hands.length; h++)
+			this.#updatePlayer(hands[h]);
+	}
+
+	#updatePlayer(hand)
+	{
+		if(hand.playerId == this.#playerId)
 		{
-			let hand = hands[h];
-			if(hand.playerId == this.#playerId)
-			{
-				// my hand
-				this.#playerRows[hand.playerId].querySelector('.js-cards').textContent = hand.hand.join(', ');
-
-			}
-			else
-			{
-				// someone elses hand
-				this.#playerRows[hand.playerId].querySelector('.js-cards').textContent = hand.cardsRemaining;
-			}
-
-			if(hand.eldest)
-				this.setActive(hand.playerId);
+			// my hand
+			this.#playerRows[hand.playerId].querySelector('.js-cards').textContent = hand.cards.join(', ');
 		}
+		else
+		{
+			// someone elses hand
+			this.#playerRows[hand.playerId].querySelector('.js-cards').textContent = hand.cardsRemaining;
+		}
+
+		if(hand.currentPlayer)
+			this.setCurrentPlayer(hand.playerId);
 	}
 
 	handPlayed(hand)

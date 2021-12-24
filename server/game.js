@@ -1,5 +1,5 @@
 const suits = [ 'D', 'H', 'C', 'S' ];
-const cards = [ 'A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K' ];
+const numerics = [ 'A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K' ];
 
 export default class Game
 {
@@ -8,6 +8,7 @@ export default class Game
 	#maxPlayers = 0;
 	#players = {}
 	#playedHands = [];
+	#currentPlayerIndex = null;
 
 	constructor(name, id, maxPlayers)
 	{
@@ -24,7 +25,7 @@ export default class Game
 		this.#players[id] = {
 			id,
 			name,
-			hand: []
+			cards: []
 		}
 
 		return Promise.resolve({
@@ -39,8 +40,9 @@ export default class Game
 		// TODO: prevent double dealing
 
 		let deck = this.#buildDeck(numJokers);
-		let hands = this.#dealDeck(deck, dealerPlayerId);
-		return Promise.resolve(hands);
+		this.#dealDeck(deck, dealerPlayerId);
+		let playersHands = this.#getPlayersHands();
+		return Promise.resolve(playersHands);
 	}
 
 	#buildDeck(numJokers)
@@ -49,7 +51,7 @@ export default class Game
 		for(let i = 0; i < 13; i++)
 		{
 			for(let suit = 0; suit < 4; suit++)
-				deck.push(cards[i] + suits[suit]);
+				deck.push(numerics[i] + suits[suit]);
 		}
 
 		for(let j = 1; j < numJokers; j++)
@@ -66,47 +68,81 @@ export default class Game
 		let playersArray = Object.values(this.#players)
 
 		// find/choose dealer
-		let eldest = null;
+		this.#currentPlayerIndex = null;
 		if(!dealerPlayerId)
-			eldest = Math.floor(Math.random() * playersArray.length)
+		this.#currentPlayerIndex = Math.floor(Math.random() * playersArray.length)
 		else
 		{
-			eldest = playersArray.findIndex(player => player.id == dealerPlayerId) + 1;
-			if(eldest == playersArray.length)
-				eldest = 0;
+			this.#currentPlayerIndex = playersArray.findIndex(player => player.id == dealerPlayerId) + 1;
+			if(this.#currentPlayerIndex == playersArray.length)
+			this.#currentPlayerIndex = 0;
 		}
 
 		// deal
-		let p = eldest;
+		let p = this.#currentPlayerIndex;
 		while(deck.length > 0)
 		{
 			let card = deck.pop();
-			playersArray[p].hand.push(card);
+			playersArray[p].cards.push(card);
 
 			if(++p == playersArray.length)
 				p = 0;
 		}
-
-		// return players' hands
-		return playersArray.map((p, i) => ({
-			playerId: p.id,
-			hand: p.hand,
-			eldest: i == eldest
-		}));
 	}
 
+	/// Returns an array of hand-views for each player, your own hand contains the cards, others' hands contains just the number of cards
+	#getPlayersHands()
+	{
+		let playersArray = Object.values(this.#players)
+		let playersHands = [];
+		for(var p = 0; p < playersArray.length; p++)
+		{
+			// give each player their respective view of what everyone's hand looks like
+			let handsView = playersArray.map(player => {
+				// your own hand
+				if(player.id == playersArray[p].id)
+					return {
+						playerId: player.id,
+						cards: player.cards,
+						currentPlayer: this.#currentPlayerIndex == p
+					};
+
+				// someone elses hand
+				return {
+					playerId: player.id,
+					cardsRemaining: player.cards.length,
+					currentPlayer: this.#currentPlayerIndex == p
+				}
+			})
+
+			playersHands.push({
+				playerId: playersArray[p].id,
+				hands: handsView
+			});
+		}
+
+		return playersHands;
+	}
+
+	/// Plays a hand into the game
 	playHand(playerId, cards)
 	{
 		let player = this.#players[playerId];
 		
 		for(var c = 0; c < cards.length; c++)
-			player.hand.splice(player.hand.findIndex(card => card == cards[c]), 1)
+			player.cards.splice(player.cards.findIndex(card => card == cards[c]), 1)
 
 		let playedHand = {
 			playerId,
 			cards
 		};
 		this.#playedHands.push(playedHand);
-		return playedHand;
+
+		let playersHands = this.#getPlayersHands();
+
+		return {
+			playersHands,
+			playedHand
+		};
 	}
 }

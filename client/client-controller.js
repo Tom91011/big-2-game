@@ -24,8 +24,8 @@ export default class ClientController
 			else if(value.type == 'player-joined')
 				this.playerJoined(value.payload);
 
-			else if(value.type == 'hands-dealt')
-				this.handsDealt(value.payload);
+			else if(value.type == 'hands-updated')
+				this.handsUpdated(value.payload);
 
 			else if(value.type == 'hand-played')
 				this.handPlayed(value.payload);
@@ -58,9 +58,9 @@ export default class ClientController
 		return {id, name};
 	}
 
-	async handsDealt(hands)
+	async handsUpdated(hands)
 	{
-		this.#view.handsDealt(hands);
+		this.#view.handsUpdated(hands);
 		
 	}
 

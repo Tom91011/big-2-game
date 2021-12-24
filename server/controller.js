@@ -75,27 +75,19 @@ export default class Controller
 	async #deal(gameId, numJokers, dealerPlayerId = null)
 	{
 		let game = this.#games[gameId];
-		let hands = await game.deal(numJokers, dealerPlayerId);
-		for(var h = 0; h < hands.length; h++)
+		let playersHands = await game.deal(numJokers, dealerPlayerId);
+
+		this.updateAllPlayersHands(playersHands);
+	}
+
+	async updateAllPlayersHands(playersHands)
+	{
+		for(var h = 0; h < playersHands.length; h++)
 		{
-			// give each player their respective view of what everyone's hand looks like
-			let handsView = hands.map(hand => {
-				// your own hand
-				if(hand.playerId == hands[h].playerId)
-					return hand;
-
-				// someone elses hand
-				return {
-					playerId: hand.playerId,
-					cardsRemaining: hand.hand.length,
-					eldest: hand.eldest
-				}
-			})
-
-			let playerWs = this.#playerSockets[hands[h].playerId];
+			let playerWs = this.#playerSockets[playersHands[h].playerId];
 			this.#send(playerWs, {
-				type: 'hands-dealt',
-				payload: handsView
+				type: 'hands-updated',
+				payload: playersHands[h].hands
 			})
 		}
 	}
@@ -103,20 +95,17 @@ export default class Controller
 	/// Handles a player playing a hand
 	async #playHand(gameId, playerId, cards)
 	{
-		// TODO: validate hand, remove cards from current user's hand, send played hand to all players, update player to all players
-
 		let game = this.#games[gameId];
-		let playedHand = game.playHand(playerId, cards);
+		let result = game.playHand(playerId, cards);
 
-		this.#notifyPlayers({
-			type: 'player-updated',
-			payload: { }// todo: implement me
-		})
-
+		// let everyone know what was played
 		this.#notifyPlayers({
 			type: 'hand-played',
-			payload: playedHand
+			payload: result.playedHand
 		})
+
+		// update all players' hands'
+		this.updateAllPlayersHands(result.playersHands);
 	}
 
 	/// Sends the given data via the given websocket
@@ -143,5 +132,4 @@ export default class Controller
 		let tasks = Object.values(this.#playerSockets).map(ws => this.#send(ws, payload))
 		await Promise.all(tasks);
 	}
-
 }
