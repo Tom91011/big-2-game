@@ -4,64 +4,40 @@ export default class ClientController
 {
 	#ackCallbacks = {};
 	#socket = null;
+	#bus = null;
 	#playerId = null;
 	#gameId = null;
-	#view = null;
 
-	constructor(socket, view)
+	constructor(socket, bus)
 	{
 		this.#socket = socket;
+		this.#bus = bus;
+		this.#initBus();
+
 		this.#playerId = new Date().getTime();
-
-		this.#socket.addEventListener('message', message => {
-			let value = JSON.parse(message.data);
-			console.log('Received: ');
-			console.log(value);
-
-			if(value.type == 'ack')
-				this.#ackCallbacks[value.messageId](value);
-
-			else if(value.type == 'player-joined')
-				this.playerJoined(value.payload);
-
-			else if(value.type == 'hands-updated')
-				this.handsUpdated(value.payload);
-
-			else if(value.type == 'hand-played')
-				this.handPlayed(value.payload);
-		});
-
-		this.#view = view;
-		this.attachViewListeners();
 	}
 
-	attachViewListeners()
+	#initBus()
 	{
-		this.#view.onPlayHand = cards => this.playHand(cards);
+		this.#bus.subscribe('create-game', name => this.createGame(name));
+		this.#bus.subscribe('join-game', id => this.joinGame(id));
+		this.#bus.subscribe('deal', gameId => this.deal(gameId));
+		this.#bus.subscribe('play-hand', cards => this.playHand(cards));
+
+		this.#bus.subscribe('ack', result => this.#ackCallbacks[result.messageId](result));
 	}
 
-	async playerJoined(player)
-	{
-		this.#view.addPlayer(player, player.id == this.#playerId);
-	}
-
-	async createGame(id, name)
+	async createGame(name)
 	{
 		let ack = await this.#send({
 			command: 'create',
-			gameId: id,
 			gameName: name,
 			playerId: this.#playerId
 		});
 
-		this.#gameId = id;
-		return {id, name};
-	}
+		this.#gameId = ack.gameId;
 
-	async handsUpdated(hands)
-	{
-		this.#view.handsUpdated(hands);
-		
+		this.#bus.publish('game-created', {id: this.#gameId, name});
 	}
 
 	async playHand(cards)
@@ -73,12 +49,6 @@ export default class ClientController
 			cards: cards
 		})
 	}
-
-	async handPlayed(hand)
-	{
-		this.#view.handPlayed(hand);
-	}
-
 
 	deal(gameId)
 	{
@@ -104,11 +74,11 @@ export default class ClientController
 	{
 		return new Promise((resolve, reject) => {
 			let messageId = new Date().getTime();
-			this.#ackCallbacks[messageId] = response => {
+			this.#ackCallbacks[messageId] = payload => {
 				delete this.#ackCallbacks[messageId];
-				if(response.payload.error)
-					reject(response.payload);
-				resolve(response.payload);
+				if(payload.error)
+					reject(payload);
+				resolve(payload);
 			};
 
 			json.messageId = messageId;

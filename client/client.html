@@ -1,23 +1,46 @@
 <html>
 	<body>
-		<table class="js-players">
-			<thead>
-				<tr>
-					<th>Id</th>
-					<th>Cards remaining</th>
-					<th>Current actor</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr class="js-template">
-					<td class="js-id"></td>
-					<td class="js-cards"></td>
-					<td class="js-actor"></td>
-				</tr>
-			</tbody>
-		</table>
-		<button class="js-play">Play some cards</button>
-		<div class="js-table"></div>
+		<div class="js-game-lobby">
+
+			<button class="js-create-game">Create Game</button>
+			<hr>
+			<form>
+				<label for="txtLobbyGameId">Game ID</label>
+				<input type="text" maxlength="4" name="game-id" id="txtLobbyGameId">
+				<button class="js-join-game">Join Game</button>
+			</form>
+		</div>
+
+		<div class="js-game-table d-none">
+			<div>
+				Game ID: <span class="js-game-id"></span>
+			</div>
+			<table class="js-players">
+				<thead>
+					<tr>
+						<th>Id</th>
+						<th>Cards remaining</th>
+						<th>Current actor</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="js-template">
+						<td class="js-id"></td>
+						<td class="js-cards"></td>
+						<td class="js-actor"></td>
+					</tr>
+				</tbody>
+			</table>
+			<button class="js-deal">Deal</button>
+			<button class="js-play">Play some cards</button>
+			<div class="js-table"></div>
+		</div>
 		<script type="module" src="client.js"></script>
+		<style type="text/css">
+			.d-none
+			{
+				display: none;
+			}
+		</style>
 	</body>
 </html>

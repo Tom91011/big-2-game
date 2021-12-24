@@ -21,8 +21,8 @@ export default class Controller
 		switch(data.command)
 		{
 			case 'create':
-				let game = await this.#createGame(data.gameId, data.gameName);
-				await this.#acknowledge(data.playerId, data.messageId);
+				let game = await this.#createGame(data.gameName);
+				await this.#acknowledge(data.playerId, data.messageId, { gameId: game.id});
 				await this.#addPlayer(game.id, data.playerId, data.playerName);
 				return;
 	
@@ -43,9 +43,16 @@ export default class Controller
 		}
 	}
 
+	#generateGameId(){
+		// TODO: implement
+		return '1234';
+	}
+
 	/// Creates a game
-	async #createGame(gameId, gameName)
+	async #createGame(gameName)
 	{
+		let gameId = this.#generateGameId();
+
 		// if(games[gameId])
 		// {
 		// 	acknowledge(ws, data.messageId, { error: "Game ID already exists" })
@@ -119,10 +126,11 @@ export default class Controller
 	#acknowledge = function(playerId, messageId, payload)
 	{
 		let ws = this.#playerSockets[playerId];
+		payload == payload || {}
+		payload.messageId = messageId;
 		return this.#send(ws, {
 			type: 'ack',
-			messageId: messageId,
-			payload: payload || {}
+			payload: payload
 		});
 	}
 

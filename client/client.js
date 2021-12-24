@@ -1,14 +1,18 @@
 import ClientController from './client-controller.js'
 import View from './view.js';
+import bus from './bus.js';// '@trullock/pubsub';
 
 var socket = new WebSocket("ws://localhost:8080",);
 
 socket.onopen = async function() {
-	var view = new View(document);
-	var controller = new ClientController(socket, view);
+	new View(document, bus);
+	new ClientController(socket, bus);
 
-	// demo hack to get things started
-	let game = await controller.createGame("1234", "Test game")
-	controller.deal(game.id);
+	socket.addEventListener('message', message => {
+		let msg = JSON.parse(message.data);
+		console.log('Received: ');
+		console.log(msg);
+
+		bus.publish(msg.type, msg.payload)
+	});
 };
-
