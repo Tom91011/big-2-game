@@ -126,7 +126,7 @@ export default class Controller
 	#acknowledge = function(playerId, messageId, payload)
 	{
 		let ws = this.#playerSockets[playerId];
-		payload == payload || {}
+		payload = payload || {}
 		payload.messageId = messageId;
 		return this.#send(ws, {
 			type: 'ack',
