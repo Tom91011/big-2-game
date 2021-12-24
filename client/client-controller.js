@@ -67,7 +67,9 @@ export default class ClientController
 			gameId
 		});
 
-		this.gameId = gameId;
+		this.#gameId = gameId;
+
+		this.#bus.publish('game-joined', {id: this.#gameId, name: ack.gameName});
 	}
 
 	#send(json)

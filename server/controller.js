@@ -23,12 +23,14 @@ export default class Controller
 			case 'create':
 				let game = await this.#createGame(data.gameName);
 				await this.#acknowledge(data.playerId, data.messageId, { gameId: game.id});
-				await this.#addPlayer(game.id, data.playerId, data.playerName);
+				var playersHands = await this.#addPlayer(game.id, data.playerId, data.playerName);
+				this.updateAllPlayersHands(playersHands);
 				return;
 	
 			case 'join':
-				await this.#addPlayer(data.gameId, data.playerId, data.playerName);
+				var playersHands = await this.#addPlayer(data.gameId, data.playerId, data.playerName);
 				await this.#acknowledge(data.playerId, data.messageId);
+				this.updateAllPlayersHands(playersHands);
 				break;
 	
 			case 'deal':
@@ -67,15 +69,10 @@ export default class Controller
 	}
 
 	/// Adds a player to a game
-	async #addPlayer(gameId, playerId, playerName)
+	#addPlayer(gameId, playerId, playerName)
 	{
 		let game = this.#games[gameId];
-		let player = await game.addPlayer(playerId, playerName);
-
-		await this.#notifyPlayers({
-			type: 'player-joined',
-			payload: player
-		});
+		return game.addPlayer(playerId, playerName);
 	}
 
 	/// Deals the decks to all players

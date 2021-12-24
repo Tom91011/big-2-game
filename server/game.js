@@ -28,11 +28,8 @@ export default class Game
 			cards: []
 		}
 
-		return Promise.resolve({
-			id,
-			name,
-			cardsRemaining: 0
-		});
+		let playersHands = this.#getPlayersHands();
+		return Promise.resolve(playersHands);
 	}
 
 	deal(numJokers, dealerPlayerId = null)

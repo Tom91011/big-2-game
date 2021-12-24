@@ -15,6 +15,11 @@ export default class View
 			this.#bus.publish('create-game');
 		}, false);
 
+		$container.querySelector('button.js-join-game').addEventListener('click', e => {
+			e.preventDefault();
+			this.#bus.publish('join-game', $container.querySelector('input[name=game-id]').value);
+		}, false);
+
 		this.$lobby = $container.querySelector('.js-game-lobby');
 
 		this.$gameTable = $container.querySelector('.js-game-table');
@@ -42,7 +47,7 @@ export default class View
 	#initBus()
 	{
 		this.#bus.subscribe('game-created', game => this.#gameStarted(game));
-		this.#bus.subscribe('player-joined', player => this.#addPlayer(player));
+		this.#bus.subscribe('game-joined', game => this.#gameStarted(game));
 		this.#bus.subscribe('hand-played', hand => this.#handPlayed(hand));
 		this.#bus.subscribe('hands-updated', hands => this.#handsUpdated(hands));
 	}
@@ -54,13 +59,13 @@ export default class View
 		this.$gameId.textContent = game.id;
 	}
 
-	#addPlayer(player)
+	#addPlayer(hand)
 	{
 		var $player = this.$playerRowTemplate.cloneNode(true);
-		$player.querySelector('.js-id').textContent = player.id;
-		$player.querySelector('.js-cards').textContent = player.cardsRemaining;
+		$player.querySelector('.js-id').textContent = hand.playerId;
+		$player.querySelector('.js-cards').textContent = hand.cardsRemaining;
 
-		this.#playerRows[player.id] = $player;
+		this.#playerRows[hand.playerId] = $player;
 		this.$playerTableBody.appendChild($player);
 	}
 
@@ -78,6 +83,9 @@ export default class View
 
 	#updatePlayer(hand)
 	{
+		if(!this.#playerRows[hand.playerId])
+			this.#addPlayer(hand);
+
 		if(hand.playerId == this.#playerId)
 		{
 			// my hand
