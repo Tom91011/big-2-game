@@ -4,11 +4,12 @@ export default class View
 	#playerRows = {};
 	#playerId = null;
 
-	constructor($container, bus)
+	constructor($container, bus, playerId)
 	{
 		this.#bus = bus;
 		this.#initBus();
 
+		this.#playerId = playerId;
 
 		$container.querySelector('button.js-create-game').addEventListener('click', e => {
 			this.#bus.publish('create-game');
@@ -26,6 +27,11 @@ export default class View
 
 		this.$table = $container.querySelector('.js-table')
 
+		$container.querySelector('.js-deal').addEventListener('click', e => {
+			e.preventDefault();
+			this.#bus.publish('deal')
+		}, false);
+
 		$container.querySelector('.js-play').addEventListener('click', e => {
 			e.preventDefault();
 			let cards = ['10S', 'JS', 'QS', 'KS', '2S'];
@@ -36,7 +42,7 @@ export default class View
 	#initBus()
 	{
 		this.#bus.subscribe('game-created', game => this.#gameStarted(game));
-		this.#bus.subscribe('player-joined', (player, isCurrent) => this.#addPlayer(player, isCurrent));
+		this.#bus.subscribe('player-joined', player => this.#addPlayer(player));
 		this.#bus.subscribe('hand-played', hand => this.#handPlayed(hand));
 		this.#bus.subscribe('hands-updated', hands => this.#handsUpdated(hands));
 	}
@@ -48,7 +54,7 @@ export default class View
 		this.$gameId.textContent = game.id;
 	}
 
-	#addPlayer(player, isCurrentPlayer)
+	#addPlayer(player)
 	{
 		var $player = this.$playerRowTemplate.cloneNode(true);
 		$player.querySelector('.js-id').textContent = player.id;
@@ -56,9 +62,6 @@ export default class View
 
 		this.#playerRows[player.id] = $player;
 		this.$playerTableBody.appendChild($player);
-
-		if(isCurrentPlayer)
-			this.#playerId = player.id;
 	}
 
 	#setCurrentPlayer(playerId)

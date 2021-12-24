@@ -9,7 +9,7 @@ const app = express();
 app.use(express.static(path.resolve('client')));
 
 app.get('/', function(req, res){
-	res.sendFile(path.resolve('client/client.html'));
+	res.sendFile(path.resolve('client/view.html'));
 }); 
 
 // Websocket server for game interaction

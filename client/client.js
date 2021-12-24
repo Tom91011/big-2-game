@@ -4,9 +4,12 @@ import bus from './bus.js';// '@trullock/pubsub';
 
 var socket = new WebSocket("ws://localhost:8080",);
 
+let playerId = new Date().getTime();
+
 socket.onopen = async function() {
-	new View(document, bus);
-	new ClientController(socket, bus);
+	new View(document, bus, playerId);
+	new ClientController(socket, bus, playerId);
+
 
 	socket.addEventListener('message', message => {
 		let msg = JSON.parse(message.data);

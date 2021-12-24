@@ -8,20 +8,20 @@ export default class ClientController
 	#playerId = null;
 	#gameId = null;
 
-	constructor(socket, bus)
+	constructor(socket, bus, playerId)
 	{
 		this.#socket = socket;
 		this.#bus = bus;
 		this.#initBus();
 
-		this.#playerId = new Date().getTime();
+		this.#playerId = playerId;
 	}
 
 	#initBus()
 	{
 		this.#bus.subscribe('create-game', name => this.createGame(name));
 		this.#bus.subscribe('join-game', id => this.joinGame(id));
-		this.#bus.subscribe('deal', gameId => this.deal(gameId));
+		this.#bus.subscribe('deal', () => this.deal());
 		this.#bus.subscribe('play-hand', cards => this.playHand(cards));
 
 		this.#bus.subscribe('ack', result => this.#ackCallbacks[result.messageId](result));
@@ -50,12 +50,12 @@ export default class ClientController
 		})
 	}
 
-	deal(gameId)
+	deal()
 	{
 		return this.#send({
 			command: 'deal',
 			playerId: this.#playerId,
-			gameId
+			gameId: this.#gameId
 		})
 	}
 
