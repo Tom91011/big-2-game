@@ -39,9 +39,17 @@ export default class View
 
 		$container.querySelector('.js-play').addEventListener('click', e => {
 			e.preventDefault();
-			let cards = ['10S', 'JS', 'QS', 'KS', '2S'];
+			let cards = this.#getSelectedCardsToPlay();
 			this.#bus.publish('play-hand', cards)
 		}, false);
+	}
+
+	#getSelectedCardsToPlay()
+	{
+		let $player = this.#playerRows[this.#playerId];
+		let $cards = [...$player.querySelectorAll('input[name=cards]:checked')];
+		let cards = $cards.map($card => $card.value);
+		return cards;
 	}
 
 	#initBus()
@@ -63,7 +71,7 @@ export default class View
 	{
 		var $player = this.$playerRowTemplate.cloneNode(true);
 		$player.querySelector('.js-id').textContent = hand.playerId;
-		$player.querySelector('.js-cards').textContent = hand.cardsRemaining;
+		//$player.querySelector('.js-cards').textContent = hand.cardsRemaining;
 
 		this.#playerRows[hand.playerId] = $player;
 		this.$playerTableBody.appendChild($player);
@@ -89,12 +97,32 @@ export default class View
 		if(hand.playerId == this.#playerId)
 		{
 			// my hand
-			this.#playerRows[hand.playerId].querySelector('.js-cards').textContent = hand.cards.join(', ');
+			let $player = this.#playerRows[hand.playerId];
+			let $cards = $player.querySelector('.js-cards');
+			let $cardTemplate = $player.querySelector('.js-card');
+
+			while($cards.firstElementChild)
+				$cards.removeChild($cards.firstElementChild);
+				
+			for(var c = 0; c < hand.cards.length; c++)
+			{
+				let $card = $cardTemplate.cloneNode(true);
+				let $label = $card.querySelector('label');
+				let $input = $card.querySelector('input');
+
+				$input.id = 'chkHandCard' + c;
+				$label.htmlFor = $input.id;
+				$input.value = hand.cards[c];
+				$label.textContent = hand.cards[c];
+
+				$cards.appendChild($card);
+				$card.classList.remove('d-none');
+			}
 		}
 		else
 		{
 			// someone elses hand
-			this.#playerRows[hand.playerId].querySelector('.js-cards').textContent = hand.cardsRemaining;
+			//this.#playerRows[hand.playerId].querySelector('.js-cards').textContent = hand.cardsRemaining;
 		}
 
 		if(hand.currentPlayer)
