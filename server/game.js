@@ -67,12 +67,12 @@ export default class Game
 		// find/choose dealer
 		this.#currentPlayerIndex = null;
 		if(!dealerPlayerId)
-		this.#currentPlayerIndex = Math.floor(Math.random() * playersArray.length)
+			this.#currentPlayerIndex = Math.floor(Math.random() * playersArray.length)
 		else
 		{
 			this.#currentPlayerIndex = playersArray.findIndex(player => player.id == dealerPlayerId) + 1;
 			if(this.#currentPlayerIndex == playersArray.length)
-			this.#currentPlayerIndex = 0;
+				this.#currentPlayerIndex = 0;
 		}
 
 		// deal
@@ -95,20 +95,20 @@ export default class Game
 		for(var p = 0; p < playersArray.length; p++)
 		{
 			// give each player their respective view of what everyone's hand looks like
-			let handsView = playersArray.map(player => {
+			let handsView = playersArray.map((player, i) => {
 				// your own hand
 				if(player.id == playersArray[p].id)
 					return {
 						playerId: player.id,
 						cards: player.cards,
-						currentPlayer: this.#currentPlayerIndex == p
+						currentPlayer: this.#currentPlayerIndex == i
 					};
 
 				// someone elses hand
 				return {
 					playerId: player.id,
 					cardsRemaining: player.cards.length,
-					currentPlayer: this.#currentPlayerIndex == p
+					currentPlayer: this.#currentPlayerIndex == i
 				}
 			})
 
@@ -127,7 +127,11 @@ export default class Game
 		let player = this.#players[playerId];
 		
 		for(var c = 0; c < cards.length; c++)
-			player.cards.splice(player.cards.findIndex(card => card == cards[c]), 1)
+		{
+			let cardIndex = player.cards.findIndex(card => card == cards[c]);
+			if(cardIndex > -1)
+				player.cards.splice(cardIndex, 1)
+		}
 
 		let playedHand = {
 			playerId,
