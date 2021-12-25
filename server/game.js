@@ -139,6 +139,10 @@ export default class Game
 		};
 		this.#playedHands.push(playedHand);
 
+		this.#currentPlayerIndex++;
+		if(this.#currentPlayerIndex == Object.keys(this.#players).length)
+			this.#currentPlayerIndex == 0
+
 		let playersHands = this.#getPlayersHands();
 
 		return {
