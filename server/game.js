@@ -15,14 +15,14 @@ export default class Game
 		this.#id = id;
 	}
 
-	addPlayer(id, name)
+	/// Adds a player to the game
+	addPlayer(id)
 	{
 		// TODO: prevent in-progress joining
 		// TODO: limit to max-players
 
 		this.#players[id] = {
 			id,
-			name,
 			cards: []
 		}
 
@@ -30,16 +30,19 @@ export default class Game
 		return Promise.resolve(playersHands);
 	}
 
+	/// Deals all cards + numJokers to all players, starting with the given dealer (or by randomly choosing a dealer)
 	deal(numJokers, dealerPlayerId = null)
 	{
 		// TODO: prevent double dealing
 
 		let deck = this.#buildDeck(numJokers);
+		this.#chooseDealer(dealerPlayerId);
 		this.#dealDeck(deck, dealerPlayerId);
 		let playersHands = this.#getPlayersHands();
 		return Promise.resolve(playersHands);
 	}
 
+	/// Builds a shuffled deck of 52 + numJokers cards
 	#buildDeck(numJokers)
 	{
 		let deck = [];
@@ -57,13 +60,15 @@ export default class Game
 		return deck;
 	}
 
+	/// Shuffles the given deck
 	#shuffleDeck(deck)
 	{
 		// TODO: implement me
 		return deck;
 	}
 
-	#chooseDealer(dealerPlayerId)
+	/// Chooses the dealer, using either the given playerId or randomly picking a player
+	#chooseDealer(dealerPlayerId = null)
 	{
 		let playersArray = Object.values(this.#players)
 
@@ -78,13 +83,13 @@ export default class Game
 		}
 	}
 
-	#dealDeck(deck, dealerPlayerId)
+	/// Deals the given deck to all players
+	#dealDeck(deck)
 	{
-		this.#chooseDealer(dealerPlayerId);
-
-		// deal
 		let playersArray = Object.values(this.#players)
 		let p = this.#currentPlayerIndex;
+
+		// deal all cards
 		while(deck.length > 0)
 		{
 			let card = deck.pop();
@@ -95,7 +100,8 @@ export default class Game
 		}
 	}
 
-	/// Returns an array of hand-views for each player, your own hand contains the cards, others' hands contains just the number of cards
+	/// Returns an array of hand-views for each player.
+	///  Your own hand contains the cards, others' hands contains just the number of cards
 	#getPlayersHands()
 	{
 		let playersArray = Object.values(this.#players)

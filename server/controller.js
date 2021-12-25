@@ -23,12 +23,12 @@ export default class Controller
 			case 'create':
 				let game = await this.#createGame(data.gameName);
 				await this.#acknowledge(data.playerId, data.messageId, { gameId: game.id});
-				var playersHands = await this.#addPlayer(game.id, data.playerId, data.playerName);
+				var playersHands = await this.#addPlayer(game.id, data.playerId);
 				this.updateAllPlayersHands(playersHands);
 				return;
 	
 			case 'join':
-				var playersHands = await this.#addPlayer(data.gameId, data.playerId, data.playerName);
+				var playersHands = await this.#addPlayer(data.gameId, data.playerId);
 				await this.#acknowledge(data.playerId, data.messageId);
 				this.updateAllPlayersHands(playersHands);
 				break;
