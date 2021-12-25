@@ -5,4 +5,4 @@ npm i
 node server/server.js
 ```
 
-Open `localhost:3000`
+Open `http://localhost:3000`

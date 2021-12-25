@@ -71,9 +71,8 @@ export default class View
 	{
 		var $player = this.$playerRowTemplate.cloneNode(true);
 		$player.querySelector('.js-id').textContent = hand.playerId;
-		//$player.querySelector('.js-cards').textContent = hand.cardsRemaining;
-
 		this.#playerRows[hand.playerId] = $player;
+		
 		this.$playerTableBody.appendChild($player);
 	}
 

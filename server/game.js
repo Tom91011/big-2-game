@@ -5,16 +5,14 @@ export default class Game
 {
 	#id = null;
 	#name = null;
-	#maxPlayers = 0;
 	#players = {}
 	#playedHands = [];
 	#currentPlayerIndex = null;
 
-	constructor(name, id, maxPlayers)
+	constructor(name, id)
 	{
 		this.#name = name;
 		this.#id = id;
-		this.#maxPlayers = maxPlayers
 	}
 
 	addPlayer(id, name)
@@ -54,17 +52,21 @@ export default class Game
 		for(let j = 1; j < numJokers; j++)
 			deck.push('?');
 
-			
-		// TODO: shuffle deck
+		deck = this.#shuffleDeck(deck);
 
 		return deck;
 	}
 
-	#dealDeck(deck, dealerPlayerId)
+	#shuffleDeck(deck)
+	{
+		// TODO: implement me
+		return deck;
+	}
+
+	#chooseDealer(dealerPlayerId)
 	{
 		let playersArray = Object.values(this.#players)
 
-		// find/choose dealer
 		this.#currentPlayerIndex = null;
 		if(!dealerPlayerId)
 			this.#currentPlayerIndex = Math.floor(Math.random() * playersArray.length)
@@ -74,8 +76,14 @@ export default class Game
 			if(this.#currentPlayerIndex == playersArray.length)
 				this.#currentPlayerIndex = 0;
 		}
+	}
+
+	#dealDeck(deck, dealerPlayerId)
+	{
+		this.#chooseDealer(dealerPlayerId);
 
 		// deal
+		let playersArray = Object.values(this.#players)
 		let p = this.#currentPlayerIndex;
 		while(deck.length > 0)
 		{
