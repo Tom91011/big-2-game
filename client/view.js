@@ -32,9 +32,11 @@ export default class View
 
 		this.$table = $container.querySelector('.js-table')
 
+		this.$txtNumJokers = $container.querySelector('input[name=num-jokers]');
 		$container.querySelector('.js-deal').addEventListener('click', e => {
 			e.preventDefault();
-			this.#bus.publish('deal')
+			let numJokers = parseInt(this.$txtNumJokers.value, 10);
+			this.#bus.publish('deal', numJokers);
 		}, false);
 
 		$container.querySelector('.js-play').addEventListener('click', e => {

@@ -37,7 +37,12 @@
 					</tr>
 				</tbody>
 			</table>
-			<button class="js-deal">Deal</button>
+			<form>
+				<button class="js-deal">Deal</button>
+				<label for="txtNumJokers">Number of jokers:</label>
+				<input type="number" name="num-jokers" min="0" max="4" value="2" id="txtNumJokers" />
+			</form>
+			<hr>
 			<button class="js-play">Play selected cards</button>
 			<div>Table: <span class="js-table"></span></div>
 		</div>
