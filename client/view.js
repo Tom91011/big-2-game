@@ -3,28 +3,34 @@ export default class View
 	#bus = null;
 	#playerRows = {};
 	#playerId = null;
+	#playerName = null;
 
 	constructor($container, bus, playerId)
 	{
 		this.#bus = bus;
 		this.#initBus();
-
 		this.#playerId = playerId;
 
 		$container.querySelector('button.js-create-game').addEventListener('click', e => {
-			this.#bus.publish('create-game');
+			e.preventDefault();
+			this.#bus.publish('create-game',this.playerName.value);
 		}, false);
 
 		$container.querySelector('button.js-join-game').addEventListener('click', e => {
 			e.preventDefault();
-			this.#bus.publish('join-game', $container.querySelector('input[name=game-id]').value);
+			this.#bus.publish('join-game', 
+			$container.querySelector('input[name=game-id]').value,
+			this.playerName.value
+			);
 		}, false);
 
+		this.playerName = $container.querySelector('#txtLobbyPlayerName')
+
+		
 		this.$lobby = $container.querySelector('.js-game-lobby');
 
 		this.$gameTable = $container.querySelector('.js-game-table');
 		this.$gameId = this.$gameTable.querySelector('.js-game-id');
-
 
 		this.$playerTableBody = $container.querySelector('.js-players tbody');
 		this.$playerRowTemplate = this.$playerTableBody.querySelector('.js-template');
@@ -74,7 +80,7 @@ export default class View
 		var $player = this.$playerRowTemplate.cloneNode(true);
 		$player.querySelector('.js-id').textContent = hand.playerId;
 		this.#playerRows[hand.playerId] = $player;
-		
+		$player.querySelector('.js-name').textContent = hand.playerName;
 		this.$playerTableBody.appendChild($player);
 	}
 
@@ -87,7 +93,9 @@ export default class View
 	#handsUpdated(hands)
 	{
 		for(var h = 0; h < hands.length; h++)
-			this.#updatePlayer(hands[h]);
+			{
+				this.#updatePlayer(hands[h])			
+			}
 	}
 
 	#updatePlayer(hand)
@@ -123,7 +131,8 @@ export default class View
 		else
 		{
 			// someone elses hand
-			//this.#playerRows[hand.playerId].querySelector('.js-cards').textContent = hand.cardsRemaining;
+			this.#playerRows[hand.playerId].querySelector('.js-cards').textContent = hand.cardsRemaining;
+			this.#playerRows[hand.playerId].querySelector('.js-name').textContent = hand.playerName;
 		}
 
 		if(hand.currentPlayer)
