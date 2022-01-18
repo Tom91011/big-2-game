@@ -30,7 +30,7 @@ export default class Controller
 			case 'join':
 				var playersHands = await this.#addPlayer(data.gameId, data.playerId, data.playerName);
 				await this.#acknowledge(data.playerId, data.messageId);
-				this.updateAllPlayersHands(playersHands, data.playerName);
+				this.updateAllPlayersHands(playersHands);
 				break;
 	
 			case 'deal':
@@ -84,11 +84,12 @@ export default class Controller
 		this.updateAllPlayersHands(playersHands);
 	}
 
-	async updateAllPlayersHands(playersHands, name)
+	async updateAllPlayersHands(playersHands)
 	{
 		for(var h = 0; h < playersHands.length; h++)
 		{	
 			let playerWs = this.#playerSockets[playersHands[h].playerId];
+			console.log(playersHands[h].hands)
 			this.#send(playerWs, {
 				type: 'hands-updated',
 				payload: playersHands[h].hands
@@ -113,7 +114,7 @@ export default class Controller
 	}
 
 	/// Sends the given data via the given websocket
-	#send(ws, data, name)
+	#send(ws, data)
 	{
 		// TODO: does this return a promise?
 		return ws.send(JSON.stringify(data));
