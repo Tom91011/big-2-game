@@ -103,7 +103,7 @@ export default class Game
 	/// Returns an array of hand-views for each player.
 	///  Your own hand contains the cards, others' hands contains just the number of cards
 	#getPlayersHands()
-	{
+	{	;
 		let playersArray = Object.values(this.#players)
 		let playersHands = [];
 		for(var p = 0; p < playersArray.length; p++)
@@ -118,9 +118,10 @@ export default class Game
 						cards: player.cards,
 						currentPlayer: this.#currentPlayerIndex == i
 					};
-
+					
 				// someone elses hand
 				return {
+					playerName: player.name,
 					playerId: player.id,
 					cardsRemaining: player.cards.length,
 					currentPlayer: this.#currentPlayerIndex == i
