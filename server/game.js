@@ -118,9 +118,9 @@ export default class Game
 						cards: player.cards,
 						currentPlayer: this.#currentPlayerIndex == i
 					};
-
 				// someone elses hand
 				return {
+					playerName: player.name,
 					playerId: player.id,
 					cardsRemaining: player.cards.length,
 					currentPlayer: this.#currentPlayerIndex == i
