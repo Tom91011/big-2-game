@@ -16,16 +16,16 @@ export default class Game
 	}
 
 	/// Adds a player to the game
-	addPlayer(id)
+	addPlayer(id, name)
 	{
 		// TODO: prevent in-progress joining
 		// TODO: limit to max-players
 
 		this.#players[id] = {
 			id,
+			name,
 			cards: []
 		}
-
 		let playersHands = this.#getPlayersHands();
 		return Promise.resolve(playersHands);
 	}
@@ -114,6 +114,7 @@ export default class Game
 				if(player.id == playersArray[p].id)
 					return {
 						playerId: player.id,
+						playerName: player.name,
 						cards: player.cards,
 						currentPlayer: this.#currentPlayerIndex == i
 					};

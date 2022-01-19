@@ -10,7 +10,6 @@ socket.onopen = async function() {
 	new View(document, bus, playerId);
 	new ClientController(socket, bus, playerId);
 
-
 	socket.addEventListener('message', message => {
 		let msg = JSON.parse(message.data);
 		console.log('Received: ');

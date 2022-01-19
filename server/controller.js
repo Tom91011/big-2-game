@@ -23,12 +23,12 @@ export default class Controller
 			case 'create':
 				let game = await this.#createGame(data.gameName);
 				await this.#acknowledge(data.playerId, data.messageId, { gameId: game.id});
-				var playersHands = await this.#addPlayer(game.id, data.playerId);
+				var playersHands = await this.#addPlayer(game.id, data.playerId, data.playerName);
 				this.updateAllPlayersHands(playersHands);
 				return;
 	
 			case 'join':
-				var playersHands = await this.#addPlayer(data.gameId, data.playerId);
+				var playersHands = await this.#addPlayer(data.gameId, data.playerId, data.playerName);
 				await this.#acknowledge(data.playerId, data.messageId);
 				this.updateAllPlayersHands(playersHands);
 				break;
@@ -69,7 +69,7 @@ export default class Controller
 	}
 
 	/// Adds a player to a game
-	#addPlayer(gameId, playerId, playerName)
+	#addPlayer(gameId, playerId, playerName)	
 	{
 		let game = this.#games[gameId];
 		return game.addPlayer(playerId, playerName);
@@ -87,8 +87,9 @@ export default class Controller
 	async updateAllPlayersHands(playersHands)
 	{
 		for(var h = 0; h < playersHands.length; h++)
-		{
+		{	
 			let playerWs = this.#playerSockets[playersHands[h].playerId];
+			console.log(playersHands[h].hands)
 			this.#send(playerWs, {
 				type: 'hands-updated',
 				payload: playersHands[h].hands

@@ -13,26 +13,25 @@ export default class ClientController
 		this.#socket = socket;
 		this.#bus = bus;
 		this.#initBus();
-
 		this.#playerId = playerId;
 	}
 
 	#initBus()
 	{
-		this.#bus.subscribe('create-game', name => this.createGame(name));
-		this.#bus.subscribe('join-game', id => this.joinGame(id));
 		this.#bus.subscribe('deal', numJokers => this.deal(numJokers));
+		this.#bus.subscribe('create-game', playerName => this.createGame(playerName));
+		this.#bus.subscribe('join-game', (id, playerName) => this.joinGame(id,playerName));
 		this.#bus.subscribe('play-hand', cards => this.playHand(cards));
 
 		this.#bus.subscribe('ack', result => this.#ackCallbacks[result.messageId](result));
 	}
 
-	async createGame(name)
+	async createGame(playerName)
 	{
 		let ack = await this.#send({
 			command: 'create',
-			gameName: name,
-			playerId: this.#playerId
+			playerId: this.#playerId,
+			playerName: playerName
 		});
 
 		this.#gameId = ack.gameId;
@@ -60,11 +59,12 @@ export default class ClientController
 		})
 	}
 
-	async joinGame(gameId)
+	async joinGame(gameId, playerName)
 	{
 		let ack = await this.#send({
 			command: 'join',
 			playerId: this.#playerId,
+			playerName: playerName,
 			gameId
 		});
 
@@ -76,6 +76,7 @@ export default class ClientController
 	#send(json)
 	{
 		return new Promise((resolve, reject) => {
+			
 			let messageId = new Date().getTime();
 			this.#ackCallbacks[messageId] = payload => {
 				delete this.#ackCallbacks[messageId];
