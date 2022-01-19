@@ -52,8 +52,8 @@ export default class Game
 				deck.push(numerics[i] + suits[suit]);
 		}
 
-		for(let j = 1; j < numJokers; j++)
-			deck.push('?');
+		for(let j = 0; j < numJokers; j++)
+			deck.push('??');
 
 		deck = this.#shuffleDeck(deck);
 
