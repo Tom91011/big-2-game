@@ -77,14 +77,22 @@ export default class View
 		$player.querySelector('.js-id').textContent = hand.playerId;
 		this.#playerRows[hand.playerId] = $player;
 		$player.querySelector('.js-name').textContent = hand.playerName;
-		$player.querySelector('.js-owner').textContent = hand.gameOwner;
+		$player.querySelector('.js-owner').innerHTML = hand.gameOwnerButton;
 		this.$playerTableBody.appendChild($player);
+
+		$player.querySelector('.js-owner').addEventListener('click', e => {
+			e.preventDefault();
+			if(hand.gameOwner === true)
+			{
+				console.log("Deal Clicked");
+			}
+		}, false)
 	}
 
 	#setCurrentPlayer(playerId)
 	{
 		for(const [id, $player] of Object.entries(this.#playerRows))
-			$player.querySelector('.js-actor').textContent = id == playerId;		
+			$player.querySelector('.js-actor').textContent = id == playerId;
 	}
 
 	#handsUpdated(hands)

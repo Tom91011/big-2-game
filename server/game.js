@@ -109,15 +109,26 @@ export default class Game
 		{
 			// give each player their respective view of what everyone's hand looks like
 			let handsView = playersArray.map((player, i) => {
-				// your own hand
-				if(player.id == playersArray[p].id)
+				// your own hand and you're the dealer
+				if(playersArray[p].gameOwner == true  && player.id == playersArray[p].id)
 					return {
 						playerId: player.id,
 						playerName: player.name,
 						cards: player.cards,
 						currentPlayer: this.#currentPlayerIndex == i,
+						gameOwnerButton: '<button>DEAL Button</button>',
 						gameOwner: player.gameOwner
 					};
+					// your own hand, but not the dealer
+				else if (player.id == playersArray[p].id)
+				return {
+					playerId: player.id,
+					playerName: player.name,
+					cards: player.cards,
+					currentPlayer: this.#currentPlayerIndex == i,
+					gameOwnerButton: '',
+					gameOwner: ""
+				};
 				// someone elses hand
 				return {
 					playerName: player.name,
@@ -125,7 +136,7 @@ export default class Game
 					playerName: player.name,
 					cardsRemaining: player.cards.length,
 					currentPlayer: this.#currentPlayerIndex == i,
-					gameOwner: player.gameOwner
+					gameOwnerButton: ''
 				}
 			})
 
