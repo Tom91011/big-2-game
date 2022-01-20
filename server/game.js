@@ -16,15 +16,15 @@ export default class Game
 	}
 
 	/// Adds a player to the game
-	addPlayer(id, name)
+	addPlayer(id, name, gameOwner)
 	{
 		// TODO: prevent in-progress joining
 		// TODO: limit to max-players
-
 		this.#players[id] = {
 			id,
 			name,
-			cards: []
+			cards: [],
+			gameOwner
 		}
 		let playersHands = this.#getPlayersHands();
 		return Promise.resolve(playersHands);
@@ -34,7 +34,6 @@ export default class Game
 	deal(numJokers, dealerPlayerId = null)
 	{
 		// TODO: prevent double dealing
-
 		let deck = this.#buildDeck(numJokers);
 		this.#chooseDealer(dealerPlayerId);
 		this.#dealDeck(deck, dealerPlayerId);
@@ -116,14 +115,16 @@ export default class Game
 						playerId: player.id,
 						playerName: player.name,
 						cards: player.cards,
-						currentPlayer: this.#currentPlayerIndex == i
+						currentPlayer: this.#currentPlayerIndex == i,
+						gameOwner: player.gameOwner
 					};
 				// someone elses hand
 				return {
-					playerName: player.name,
 					playerId: player.id,
+					playerName: player.name,
 					cardsRemaining: player.cards.length,
-					currentPlayer: this.#currentPlayerIndex == i
+					currentPlayer: this.#currentPlayerIndex == i,
+					gameOwner: player.gameOwner
 				}
 			})
 
@@ -132,7 +133,6 @@ export default class Game
 				hands: handsView
 			});
 		}
-
 		return playersHands;
 	}
 

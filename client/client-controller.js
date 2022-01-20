@@ -31,7 +31,8 @@ export default class ClientController
 		let ack = await this.#send({
 			command: 'create',
 			playerId: this.#playerId,
-			playerName: playerName
+			playerName: playerName,
+			gameOwner: true
 		});
 
 		this.#gameId = ack.gameId;
@@ -65,6 +66,7 @@ export default class ClientController
 			command: 'join',
 			playerId: this.#playerId,
 			playerName: playerName,
+			gameOwner: false,
 			gameId
 		});
 
