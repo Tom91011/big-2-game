@@ -22,7 +22,7 @@ export default class View
 		}, false);
 
 		this.$playerName = $container.querySelector('#txtLobbyPlayerName')
-		
+
 		this.$lobby = $container.querySelector('.js-game-lobby');
 
 		this.$gameTable = $container.querySelector('.js-game-table');
@@ -77,6 +77,7 @@ export default class View
 		$player.querySelector('.js-id').textContent = hand.playerId;
 		this.#playerRows[hand.playerId] = $player;
 		$player.querySelector('.js-name').textContent = hand.playerName;
+		$player.querySelector('.js-owner').textContent = hand.gameOwner;
 		this.$playerTableBody.appendChild($player);
 	}
 
@@ -120,14 +121,13 @@ export default class View
 
 				$cards.appendChild($card);
 				$card.classList.remove('d-none');
+
 			}
 		}
 		else
 		{
 			// someone elses hand
 			this.#playerRows[hand.playerId].querySelector('.js-cards').textContent = hand.cardsRemaining;
-			this.#playerRows[hand.playerId].querySelector('.js-name').textContent = hand.playerName;
-			console.log(hand);
 		}
 
 		if(hand.currentPlayer)
