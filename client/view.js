@@ -128,10 +128,6 @@ export default class View
 		{
 			// someone elses hand
 			this.#playerRows[hand.playerId].querySelector('.js-cards').textContent = hand.cardsRemaining;
-<<<<<<< HEAD
-			this.#playerRows[hand.playerId].querySelector('.js-name').textContent = hand.playerName;
-=======
->>>>>>> 674c834 (Give game creator the game owner property)
 		}
 
 		if(hand.currentPlayer)
