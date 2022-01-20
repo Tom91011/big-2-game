@@ -128,6 +128,7 @@ export default class View
 		{
 			// someone elses hand
 			this.#playerRows[hand.playerId].querySelector('.js-cards').textContent = hand.cardsRemaining;
+			this.#playerRows[hand.playerId].querySelector('.js-name').textContent = hand.playerName;
 		}
 
 		if(hand.currentPlayer)

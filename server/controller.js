@@ -89,7 +89,6 @@ export default class Controller
 		for(var h = 0; h < playersHands.length; h++)
 		{	
 			let playerWs = this.#playerSockets[playersHands[h].playerId];
-			console.log(playersHands[h].hands)
 			this.#send(playerWs, {
 				type: 'hands-updated',
 				payload: playersHands[h].hands

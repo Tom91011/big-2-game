@@ -118,9 +118,9 @@ export default class Game
 						currentPlayer: this.#currentPlayerIndex == i,
 						gameOwner: player.gameOwner
 					};
-
 				// someone elses hand
 				return {
+					playerName: player.name,
 					playerId: player.id,
 					playerName: player.name,
 					cardsRemaining: player.cards.length,
