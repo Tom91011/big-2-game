@@ -73,17 +73,22 @@ export default class View
 		$player.querySelector('.js-id').textContent = hand.playerId;
 		this.#playerRows[hand.playerId] = $player;
 		$player.querySelector('.js-name').textContent = hand.playerName;
-		$player.querySelector('.js-owner').innerHTML = hand.gameOwnerButton;
 		this.$playerTableBody.appendChild($player);
+
+		if(!hand.gameOwnerButton)
+		{
+		$player.querySelector('.js-owner').classList.add('d-none')
+		}
+		
 		$container.querySelector('.js-deal').addEventListener('click', e => {
 			e.preventDefault();
 	
-			if(hand.gameOwner === true)
+			if(hand.gameOwnerButton)
 			{
 				this.$txtNumJokers = $player.querySelector('.num-jokers')
 				const numJokers = parseInt(this.$txtNumJokers.value, 10);
 				this.#bus.publish('deal', numJokers);
-				$player.querySelector('.js-owner').textContent = ""
+				$player.querySelector('.js-owner').classList.add('d-none')
 			}
 		}, false);
 	}
