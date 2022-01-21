@@ -35,11 +35,6 @@ export default class View
 		this.$table = $container.querySelector('.js-table')
 
 		this.$txtNumJokers = $container.querySelector('input[name=num-jokers]');
-		$container.querySelector('.js-deal').addEventListener('click', e => {
-			e.preventDefault();
-			let numJokers = parseInt(this.$txtNumJokers.value, 10);
-			this.#bus.publish('deal', numJokers);
-		}, false);
 
 		$container.querySelector('.js-play').addEventListener('click', e => {
 			e.preventDefault();
@@ -73,6 +68,7 @@ export default class View
 
 	#addPlayer(hand)
 	{
+		const $container = document
 		var $player = this.$playerRowTemplate.cloneNode(true);
 		$player.querySelector('.js-id').textContent = hand.playerId;
 		this.#playerRows[hand.playerId] = $player;
@@ -80,13 +76,16 @@ export default class View
 		$player.querySelector('.js-owner').innerHTML = hand.gameOwnerButton;
 		this.$playerTableBody.appendChild($player);
 
-		$player.querySelector('.js-owner').addEventListener('click', e => {
+		$container.querySelector('.js-deal').addEventListener('click', e => {
 			e.preventDefault();
+	
 			if(hand.gameOwner === true)
 			{
-				console.log("Deal Clicked");
+				this.$txtNumJokers = $player.querySelector('.num-jokers')
+				const numJokers = parseInt(this.$txtNumJokers.value, 10);
+				this.#bus.publish('deal', numJokers);
 			}
-		}, false)
+		}, false);
 	}
 
 	#setCurrentPlayer(playerId)

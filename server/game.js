@@ -116,7 +116,12 @@ export default class Game
 						playerName: player.name,
 						cards: player.cards,
 						currentPlayer: this.#currentPlayerIndex == i,
-						gameOwnerButton: '<button>DEAL Button</button>',
+						gameOwnerButton: 
+						`<form class="js-deal-form">
+							<button class="js-deal">Deal</button>
+							<label for="txtNumJokers">Number of jokers:</label>
+							<input class="num-jokers"type="number" name="num-jokers" min="0" max="4" value="2" id="txtNumJokers" />
+						</form>`,
 						gameOwner: player.gameOwner
 					};
 					// your own hand, but not the dealer
@@ -127,7 +132,7 @@ export default class Game
 					cards: player.cards,
 					currentPlayer: this.#currentPlayerIndex == i,
 					gameOwnerButton: '',
-					gameOwner: ""
+					gameOwner: ''
 				};
 				// someone elses hand
 				return {
