@@ -17,13 +17,13 @@ export default class Controller
 
 		// TODO: make sure the client reconnects properly
 		this.#playerSockets[data.playerId] = ws;
-
+		
 		switch(data.command)
 		{
 			case 'create':
 				let game = await this.#createGame(data.gameName);
 				await this.#acknowledge(data.playerId, data.messageId, { gameId: game.id});
-				var playersHands = await this.#addPlayer(game.id, data.playerId, data.playerName, data.gameOwner);
+				var playersHands = await this.#addPlayer(game.id, data.playerId, data.playerName, data.gameOwner, Game.gameStarted);
 				this.updateAllPlayersHands(playersHands);
 				return;
 	
@@ -76,12 +76,11 @@ export default class Controller
 	}
 
 	/// Deals the decks to all players
-	async #deal(gameId, numJokers, dealerPlayerId = null)
+	async #deal(gameId, numJokers, dealerPlayerId = null, gameStarted)
 	{
 		let game = this.#games[gameId];
-		let playersHands = await game.deal(numJokers, dealerPlayerId);
-
-		this.updateAllPlayersHands(playersHands);
+		let playersHands = await game.deal(numJokers, dealerPlayerId, gameStarted);
+		this.updateAllPlayersHands(playersHands, gameStarted);
 	}
 
 	async updateAllPlayersHands(playersHands)

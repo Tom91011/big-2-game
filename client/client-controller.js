@@ -18,7 +18,7 @@ export default class ClientController
 
 	#initBus()
 	{
-		this.#bus.subscribe('deal', numJokers => this.deal(numJokers));
+		this.#bus.subscribe('deal', (numJokers, gameStarted) => this.deal(numJokers, gameStarted));
 		this.#bus.subscribe('create-game', playerName => this.createGame(playerName));
 		this.#bus.subscribe('join-game', (id, playerName) => this.joinGame(id,playerName));
 		this.#bus.subscribe('play-hand', cards => this.playHand(cards));
@@ -50,13 +50,14 @@ export default class ClientController
 		})
 	}
 
-	deal(numJokers)
-	{
+	deal(numJokers, gameStarted)
+	{	
 		return this.#send({
 			command: 'deal',
 			playerId: this.#playerId,
 			gameId: this.#gameId,
-			numJokers
+			numJokers,
+			gameStarted: gameStarted
 		})
 	}
 

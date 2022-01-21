@@ -56,7 +56,7 @@ export default class View
 		this.#bus.subscribe('game-created', game => this.#gameStarted(game));
 		this.#bus.subscribe('game-joined', game => this.#gameStarted(game));
 		this.#bus.subscribe('hand-played', hand => this.#handPlayed(hand));
-		this.#bus.subscribe('hands-updated', hands => this.#handsUpdated(hands));
+		this.#bus.subscribe('hands-updated', (hands, gameStarted) => this.#handsUpdated(hands, gameStarted));
 	}
 
 	#gameStarted(game)
@@ -66,7 +66,7 @@ export default class View
 		this.$gameId.textContent = game.id;
 	}
 
-	#addPlayer(hand)
+	#addPlayer(hand, gameStarted)
 	{
 		const $container = document
 		var $player = this.$playerRowTemplate.cloneNode(true);
@@ -74,21 +74,19 @@ export default class View
 		this.#playerRows[hand.playerId] = $player;
 		$player.querySelector('.js-name').textContent = hand.playerName;
 		this.$playerTableBody.appendChild($player);
-
+		
 		if(!hand.gameOwnerButton)
 		{
 		$player.querySelector('.js-owner').classList.add('d-none')
 		}
-		
+
 		$container.querySelector('.js-deal').addEventListener('click', e => {
-			e.preventDefault();
-	
+			e.preventDefault();	
 			if(hand.gameOwnerButton)
 			{
 				this.$txtNumJokers = $player.querySelector('.num-jokers')
 				const numJokers = parseInt(this.$txtNumJokers.value, 10);
-				this.#bus.publish('deal', numJokers);
-				$player.querySelector('.js-owner').classList.add('d-none')
+				this.#bus.publish('deal', numJokers, gameStarted);
 			}
 		}, false);
 	}
@@ -99,16 +97,19 @@ export default class View
 			$player.querySelector('.js-actor').textContent = id == playerId;
 	}
 
-	#handsUpdated(hands)
+	#handsUpdated(hands, gameStarted)
 	{
 		for(var h = 0; h < hands.length; h++)
-				this.#updatePlayer(hands[h])					
+				this.#updatePlayer(hands[h], gameStarted)					
 	}
 
-	#updatePlayer(hand)
+	#updatePlayer(hand, gameStarted)
 	{
+		if(hand.gameStarted)
+			document.querySelector('.js-owner').classList.add('d-none')
+		
 		if(!this.#playerRows[hand.playerId])
-			this.#addPlayer(hand);
+			this.#addPlayer(hand, gameStarted);
 
 		if(hand.playerId == this.#playerId)
 		{
@@ -133,7 +134,6 @@ export default class View
 
 				$cards.appendChild($card);
 				$card.classList.remove('d-none');
-
 			}
 		}
 		else
