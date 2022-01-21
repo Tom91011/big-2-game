@@ -75,7 +75,6 @@ export default class View
 		$player.querySelector('.js-name').textContent = hand.playerName;
 		$player.querySelector('.js-owner').innerHTML = hand.gameOwnerButton;
 		this.$playerTableBody.appendChild($player);
-
 		$container.querySelector('.js-deal').addEventListener('click', e => {
 			e.preventDefault();
 	
@@ -84,6 +83,7 @@ export default class View
 				this.$txtNumJokers = $player.querySelector('.num-jokers')
 				const numJokers = parseInt(this.$txtNumJokers.value, 10);
 				this.#bus.publish('deal', numJokers);
+				$player.querySelector('.js-owner').textContent = ""
 			}
 		}, false);
 	}
