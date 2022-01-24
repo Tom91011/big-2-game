@@ -1,5 +1,6 @@
 const suits = [ 'D', 'H', 'C', 'S' ];
 const numerics = [ 'A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K' ];
+let gameStarted
 
 export default class Game
 {
@@ -18,6 +19,7 @@ export default class Game
 	/// Adds a player to the game
 	addPlayer(id, name, gameOwner)
 	{
+		gameStarted = false
 		// TODO: prevent in-progress joining
 		// TODO: limit to max-players
 		this.#players[id] = {
@@ -85,6 +87,7 @@ export default class Game
 	/// Deals the given deck to all players
 	#dealDeck(deck)
 	{
+		gameStarted = true
 		let playersArray = Object.values(this.#players)
 		let p = this.#currentPlayerIndex;
 
@@ -109,15 +112,26 @@ export default class Game
 		{
 			// give each player their respective view of what everyone's hand looks like
 			let handsView = playersArray.map((player, i) => {
-				// your own hand
-				if(player.id == playersArray[p].id)
+				// your own hand and you're the game owner
+				if(playersArray[p].gameOwner == true  && player.id == playersArray[p].id)
+				
 					return {
 						playerId: player.id,
 						playerName: player.name,
 						cards: player.cards,
 						currentPlayer: this.#currentPlayerIndex == i,
-						gameOwner: player.gameOwner
+						gameOwnerButton: player.gameOwner,
+						gameStarted, gameStarted
 					};
+					// your own hand, but not the game owner
+				else if (player.id == playersArray[p].id)
+				return {
+					playerId: player.id,
+					playerName: player.name,
+					cards: player.cards,
+					currentPlayer: this.#currentPlayerIndex == i,
+					gameOwnerButton: false
+				};
 				// someone elses hand
 				return {
 					playerName: player.name,
@@ -125,7 +139,7 @@ export default class Game
 					playerName: player.name,
 					cardsRemaining: player.cards.length,
 					currentPlayer: this.#currentPlayerIndex == i,
-					gameOwner: player.gameOwner
+					gameOwnerButton: false
 				}
 			})
 

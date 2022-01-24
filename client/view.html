@@ -30,7 +30,6 @@
 						<th>Player Name</th>
 						<th>Cards</th>
 						<th>Current actor</th>
-						<th>Game Owner</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -45,14 +44,17 @@
 							<div class="js-cards"></div>
 						</td>
 						<td class="js-actor"></td>
-						<td class="js-owner"></td>
+						<td class="js-owner">
+							<form class="js-deal-form">
+								<button class="js-deal">Deal</button>
+								<label for="txtNumJokers">Number of jokers:</label>
+								<input class="num-jokers"type="number" name="num-jokers" min="0" max="4" value="2" id="txtNumJokers" />
+							</form>
+						</td>
 					</tr>
 				</tbody>
 			</table>
-			<form>
-				<button class="js-deal">Deal</button>
-				<label for="txtNumJokers">Number of jokers:</label>
-				<input type="number" name="num-jokers" min="0" max="4" value="2" id="txtNumJokers" />
+			<form class="js-deal">
 			</form>
 			<hr>
 			<button class="js-play">Play selected cards</button>
