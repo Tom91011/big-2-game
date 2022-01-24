@@ -1,3 +1,5 @@
+const $container = document
+
 export default class View
 {
 	#bus = null;
@@ -68,7 +70,6 @@ export default class View
 
 	#addPlayer(hand, gameStarted)
 	{
-		const $container = document
 		var $player = this.$playerRowTemplate.cloneNode(true);
 		$player.querySelector('.js-id').textContent = hand.playerId;
 		this.#playerRows[hand.playerId] = $player;
@@ -106,7 +107,16 @@ export default class View
 	#updatePlayer(hand, gameStarted)
 	{
 		if(hand.gameStarted)
-			document.querySelector('.js-owner').classList.add('d-none')
+			$container.querySelector('.js-owner').classList.add('d-none')
+
+		if(hand.gameStarted)
+			$container.querySelector('.js-owner').classList.add('d-none')		
+
+			// displays the play-cards button if the players view is the current player, removes the button if not
+		if(hand.currentPlayer && hand.playerId == this.#playerId) 
+			$container.querySelector('.js-play').classList.remove('d-none')
+		else if((!hand.currentPlayer && hand.playerId == this.#playerId))
+			$container.querySelector('.js-play').classList.add('d-none')
 		
 		if(!this.#playerRows[hand.playerId])
 			this.#addPlayer(hand, gameStarted);
