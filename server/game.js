@@ -171,8 +171,8 @@ export default class Game
 
 		this.#currentPlayerIndex++;
 		if(this.#currentPlayerIndex == Object.keys(this.#players).length)
-			this.#currentPlayerIndex == 0
-
+			this.#currentPlayerIndex = 0
+		
 		let playersHands = this.#getPlayersHands();
 
 		return {

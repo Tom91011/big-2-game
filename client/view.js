@@ -109,10 +109,7 @@ export default class View
 		if(hand.gameStarted)
 			$container.querySelector('.js-owner').classList.add('d-none')
 
-		if(hand.gameStarted)
-			$container.querySelector('.js-owner').classList.add('d-none')		
-
-			// displays the play-cards button if the players view is the current player, removes the button if not
+		// displays the play-cards button if the players view is the current player, removes the button if not
 		if(hand.currentPlayer && hand.playerId == this.#playerId) 
 			$container.querySelector('.js-play').classList.remove('d-none')
 		else if((!hand.currentPlayer && hand.playerId == this.#playerId))
