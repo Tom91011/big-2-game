@@ -38,7 +38,7 @@ export default class View
 
 		this.$txtNumJokers = $container.querySelector('input[name=num-jokers]');
 
-		$container.querySelector('.js-play').addEventListener('click', e => {
+		$container.querySelector('.js-game-actions').addEventListener('click', e => {
 			e.preventDefault();
 			let cards = this.#getSelectedCardsToPlay();
 			this.#bus.publish('play-hand', cards)
@@ -111,9 +111,9 @@ export default class View
 
 		// displays the play-cards button if the players view is the current player, removes the button if not
 		if(hand.currentPlayer && hand.playerId == this.#playerId) 
-			$container.querySelector('.js-play').classList.remove('d-none')
+			$container.querySelector('.js-game-actions').classList.remove('d-none')
 		else if((!hand.currentPlayer && hand.playerId == this.#playerId))
-			$container.querySelector('.js-play').classList.add('d-none')
+			$container.querySelector('.js-game-actions').classList.add('d-none')
 		
 		if(!this.#playerRows[hand.playerId])
 			this.#addPlayer(hand, gameStarted);
@@ -155,6 +155,7 @@ export default class View
 
 	#handPlayed(hand)
 	{
+		if(hand.cards.length != 0)
 		this.$table.textContent = hand.cards.join(', ');
 	}
 }
