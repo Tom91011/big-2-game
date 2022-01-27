@@ -53,13 +53,13 @@ export default class View
 
 	#initBus()
 	{
-		this.#bus.subscribe('game-created', game => this.#gameStarted(game));
-		this.#bus.subscribe('game-joined', game => this.#gameStarted(game));
+		this.#bus.subscribe('game-created', game => this.#openGameRoom(game));
+		this.#bus.subscribe('game-joined', game => this.#openGameRoom(game));
 		this.#bus.subscribe('hand-played', hand => this.#handPlayed(hand));
 		this.#bus.subscribe('hands-updated', (hands, gameStarted) => this.#handsUpdated(hands, gameStarted));
 	}
 
-	#gameStarted(game)
+	#openGameRoom(game)
 	{
 		this.$lobby.classList.add('d-none');
 		this.$gameTable.classList.remove('d-none');
