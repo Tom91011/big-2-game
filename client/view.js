@@ -17,7 +17,7 @@ export default class View
 
 		$container.querySelector('button.js-join-game').addEventListener('click', e => {
 			e.preventDefault();
-			this.#bus.publish('join-game', $container.querySelector('input[name=game-id]').value, this.$playerName.value
+			this.#bus.publish('get-game-status', $container.querySelector('input[name=game-id]').value, this.$playerName.value
 			);
 		}, false);
 
@@ -54,9 +54,15 @@ export default class View
 	#initBus()
 	{
 		this.#bus.subscribe('game-created', game => this.#openGameRoom(game));
-		this.#bus.subscribe('game-joined', game => this.#openGameRoom(game));
+		this.#bus.subscribe('game-joined', (game) => this.#openGameRoom(game));
+		this.#bus.subscribe('send-alert', (gameStatus) => this.#sendAlert(gameStatus));
 		this.#bus.subscribe('hand-played', hand => this.#handPlayed(hand));
 		this.#bus.subscribe('hands-updated', (hands, gameStarted) => this.#handsUpdated(hands, gameStarted));
+	}
+
+	#sendAlert(gameStatus) {
+		if(gameStatus.gameStatus)
+		alert("This game has already started")
 	}
 
 	#openGameRoom(game)

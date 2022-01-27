@@ -1,6 +1,5 @@
 const suits = [ 'D', 'H', 'C', 'S' ];
 const numerics = [ 'A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K' ];
-let gameStarted
 
 export default class Game
 {
@@ -9,6 +8,7 @@ export default class Game
 	#players = {}
 	#playedHands = [];
 	#currentPlayerIndex = null;
+	#gameStarted = false;
 
 	constructor(name, id)
 	{
@@ -19,7 +19,6 @@ export default class Game
 	/// Adds a player to the game
 	addPlayer(id, name, gameOwner)
 	{
-		gameStarted = false
 		// TODO: prevent in-progress joining
 		// TODO: limit to max-players
 		this.#players[id] = {
@@ -29,7 +28,8 @@ export default class Game
 			gameOwner
 		}
 		let playersHands = this.#getPlayersHands();
-		return Promise.resolve(playersHands);
+		if(!this.#gameStarted)
+			return Promise.resolve(playersHands);
 	}
 
 	/// Deals all cards + numJokers to all players, starting with the given dealer (or by randomly choosing a dealer)
@@ -41,6 +41,10 @@ export default class Game
 		this.#dealDeck(deck, dealerPlayerId);
 		let playersHands = this.#getPlayersHands();
 		return Promise.resolve(playersHands);
+	}
+
+	gameStatus() {
+		return this.#gameStarted
 	}
 
 	/// Builds a shuffled deck of 52 + numJokers cards
@@ -87,7 +91,7 @@ export default class Game
 	/// Deals the given deck to all players
 	#dealDeck(deck)
 	{
-		gameStarted = true
+		this.#gameStarted = true
 		let playersArray = Object.values(this.#players)
 		let p = this.#currentPlayerIndex;
 
@@ -121,7 +125,7 @@ export default class Game
 						cards: player.cards,
 						currentPlayer: this.#currentPlayerIndex == i,
 						gameOwnerButton: player.gameOwner,
-						gameStarted, gameStarted
+						gameStarted: this.#gameStarted
 					};
 					// your own hand, but not the game owner
 				else if (player.id == playersArray[p].id)

@@ -20,7 +20,7 @@ export default class ClientController
 	{
 		this.#bus.subscribe('deal', (numJokers, gameStarted) => this.deal(numJokers, gameStarted));
 		this.#bus.subscribe('create-game', playerName => this.createGame(playerName));
-		this.#bus.subscribe('join-game', (id, playerName) => this.joinGame(id,playerName));
+		this.#bus.subscribe('get-game-status', (id, playerName) => this.getGameStatus(id,playerName));
 		this.#bus.subscribe('play-hand', cards => this.playHand(cards));
 
 		this.#bus.subscribe('ack', result => this.#ackCallbacks[result.messageId](result));
@@ -74,6 +74,20 @@ export default class ClientController
 		this.#gameId = gameId;
 
 		this.#bus.publish('game-joined', {id: this.#gameId, name: ack.gameName});
+	}
+
+	// getGameStatus checks the games status with the server (started = true, not started = false). If false it runs the joinGame function to add the player. if true then alerts the player that the games started
+	async getGameStatus(gameId, playerName)
+	{
+		let ack = await this.#send({
+			command: 'server-game-status',
+			gameId
+		});
+		
+		if(!ack.gameStatus)
+		this.joinGame(gameId, playerName)
+		else
+		this.#bus.publish('send-alert', {gameStatus: ack.gameStatus});
 	}
 
 	#send(json)

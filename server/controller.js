@@ -26,13 +26,17 @@ export default class Controller
 				var playersHands = await this.#addPlayer(game.id, data.playerId, data.playerName, data.gameOwner, Game.gameStarted);
 				this.updateAllPlayersHands(playersHands);
 				return;
-	
-			case 'join':
-				var playersHands = await this.#addPlayer(data.gameId, data.playerId, data.playerName, data.gameOwner);
-				await this.#acknowledge(data.playerId, data.messageId);
-				this.updateAllPlayersHands(playersHands);
+
+			case 'server-game-status':
+				let gameStatus = this.#getGameStatus(data.gameId);
+				await this.#acknowledge(data.playerId, data.messageId,{gameStatus: gameStatus});
 				break;
-	
+				
+			case 'join':
+					var playersHands = await this.#addPlayer(data.gameId, data.playerId, data.playerName, data.gameOwner);
+					await this.#acknowledge(data.playerId, data.messageId);
+					this.updateAllPlayersHands(playersHands);
+					break;
 			case 'deal':
 				await this.#deal(data.gameId, data.numJokers, data.dealerPlayerId);
 				await this.#acknowledge(data.playerId, data.messageId);
@@ -41,8 +45,13 @@ export default class Controller
 			case 'play-hand':
 				await this.#playHand(data.gameId, data.playerId, data.cards);
 				await this.#acknowledge(data.playerId, data.messageId);
+			}
+	}
 
-		}
+	#getGameStatus(gameId) {
+		let game = this.#games[gameId];
+		let gameStatus = game.gameStatus()
+		return gameStatus;
 	}
 
 	#generateGameId(){
@@ -72,7 +81,8 @@ export default class Controller
 	#addPlayer(gameId, playerId, playerName, gameOwner)	
 	{
 		let game = this.#games[gameId];
-		return game.addPlayer(playerId, playerName, gameOwner);
+		let newPlayer = game.addPlayer(playerId, playerName, gameOwner);
+		return newPlayer
 	}
 
 	/// Deals the decks to all players
