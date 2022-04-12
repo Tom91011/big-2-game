@@ -42,12 +42,20 @@ export default class ClientController
 
 	async playHand(cards)
 	{
-		let ack = await this.#send({
-			command: 'play-hand',
-			gameId: this.#gameId,
-			playerId: this.#playerId,
-			cards: cards
-		})
+		try
+		{
+			await this.#send({
+				command: 'play-hand',
+				gameId: this.#gameId,
+				playerId: this.#playerId,
+				cards: cards
+			});
+		}
+		catch(e)
+		{
+			this.#bus.publish('error-occurred', e.error);
+		}
+		
 	}
 
 	deal(numJokers, gameStarted)

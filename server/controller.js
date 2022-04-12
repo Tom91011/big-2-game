@@ -57,7 +57,6 @@ export default class Controller
 
 			case 'play-hand':
 				await this.#playHand(data.gameId, data.playerId, data.cards);
-				await this.#acknowledge(data.playerId, data.messageId);
 
 		}
 	}
@@ -116,16 +115,27 @@ export default class Controller
 	async #playHand(gameId, playerId, cards)
 	{
 		let game = this.#games[gameId];
-		let result = game.playHand(playerId, cards);
 
-		// let everyone know what was played
-		this.#notifyPlayers({
-			type: 'hand-played',
-			payload: result.playedHand
-		})
+		if(game.currentPlayerId == playerId)
+		{
+			let result = game.playHand(playerId, cards);
 
-		// update all players' hands'
-		this.updateAllPlayersHands(result.playersHands);
+			// let everyone know what was played
+			this.#notifyPlayers({
+				type: 'hand-played',
+				payload: result.playedHand
+			});
+
+			// update all players' hands'
+			this.updateAllPlayersHands(result.playersHands);
+
+			await this.#acknowledge(data.playerId, data.messageId);
+
+		}
+		else
+		{
+			await this.#acknowledge(data.playerId, data.messageId, { error: "not-current-player" });
+		}
 	}
 
 	/// Sends the given data via the given websocket

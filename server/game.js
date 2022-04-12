@@ -23,6 +23,11 @@ export default class Game
 		return this.#gameStarted;
 	}
 
+	get currentPlayerId()
+	{
+		return this.#players[this.#currentPlayerIndex];
+	}
+
 	/// Adds a player to the game
 	addPlayer(id, name, gameOwner)
 	{
@@ -171,6 +176,12 @@ export default class Game
 
 		let player = this.#players[playerId];
 		
+		if(!player)
+			throw Error(`Player ${playerId} does not exist`);
+
+		if(playerId != this.#players[this.currentPlayerIndex].id)
+			throw Error(`Player ${playerId} is not the current player`);
+
 		for(var c = 0; c < cards.length; c++)
 		{
 			let cardIndex = player.cards.findIndex(card => card == cards[c]);
