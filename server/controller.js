@@ -28,6 +28,16 @@ export default class Controller
 				return;
 	
 			case 'join':
+				// todo: validate game hasnt started
+
+				if(!this.#games[data.gameId])
+				{
+					await this.#acknowledge(data.playerId, data.messageId, {
+						error: "game-doesnt-exist"
+					});
+					break;
+				}
+
 				var playersHands = await this.#addPlayer(data.gameId, data.playerId, data.playerName, data.gameOwner);
 				await this.#acknowledge(data.playerId, data.messageId);
 				this.updateAllPlayersHands(playersHands);

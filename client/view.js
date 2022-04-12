@@ -57,6 +57,8 @@ export default class View
 		this.#bus.subscribe('game-joined', game => this.#gameStarted(game));
 		this.#bus.subscribe('hand-played', hand => this.#handPlayed(hand));
 		this.#bus.subscribe('hands-updated', (hands, gameStarted) => this.#handsUpdated(hands, gameStarted));
+
+		this.#bus.subscribe('error-occurred', message => alert(message));
 	}
 
 	#gameStarted(game)

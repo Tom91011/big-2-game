@@ -63,17 +63,28 @@ export default class ClientController
 
 	async joinGame(gameId, playerName)
 	{
-		let ack = await this.#send({
-			command: 'join',
-			playerId: this.#playerId,
-			playerName: playerName,
-			gameOwner: false,
-			gameId
-		});
+		try
+		{	
+			let ack = await this.#send({
+				command: 'join',
+				playerId: this.#playerId,
+				playerName: playerName,
+				gameOwner: false,
+				gameId
+			});
 
-		this.#gameId = gameId;
+			this.#gameId = gameId;
+			this.#bus.publish('game-joined', {id: this.#gameId, name: ack.gameName});
+		} 
+		catch(e)
+		{
+			if(e.error == "game-doesnt-exist")
+			{
+				this.#bus.publish('error-occurred', `Game ${gameId} does not exist`);
+			}
 
-		this.#bus.publish('game-joined', {id: this.#gameId, name: ack.gameName});
+			// TODO: handle game in progress
+		}
 	}
 
 	#send(json)
