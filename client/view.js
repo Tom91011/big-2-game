@@ -36,7 +36,8 @@ export default class View
 
 		this.$txtNumJokers = $container.querySelector('input[name=num-jokers]');
 
-		$container.querySelector('.js-play').addEventListener('click', e => {
+		this.$btnPlayHand = $container.querySelector('.js-play');
+		this.$btnPlayHand.addEventListener('click', e => {
 			e.preventDefault();
 			let cards = this.#getSelectedCardsToPlay();
 			this.#bus.publish('play-hand', cards)
@@ -93,10 +94,16 @@ export default class View
 		}, false);
 	}
 
-	#setCurrentPlayer(playerId)
+	#setCurrentPlayer(currentPlayerId)
 	{
 		for(const [id, $player] of Object.entries(this.#playerRows))
-			$player.querySelector('.js-actor').textContent = id == playerId;
+		{
+			let isCurrentPlayer = id == currentPlayerId;
+			$player.querySelector('.js-actor').textContent = isCurrentPlayer;
+		}
+
+		let weAreCurrentPlayer = this.#playerId == currentPlayerId;
+		this.$btnPlayHand.disabled = !weAreCurrentPlayer;
 	}
 
 	#handsUpdated(hands, gameStarted)
