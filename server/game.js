@@ -1,6 +1,5 @@
 const suits = [ 'D', 'H', 'C', 'S' ];
 const numerics = [ 'A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K' ];
-let gameStarted
 
 export default class Game
 {
@@ -9,23 +8,27 @@ export default class Game
 	#players = {}
 	#playedHands = [];
 	#currentPlayerIndex = null;
-	gameStarted = false;
+	#gameStarted = false;
 
 	constructor(name, id)
 	{
 		this.#name = name;
 		this.#id = id;
 		
-		this.gameStarted = false;
+		this.#gameStarted = false;
+	}
+
+	get gameStarted()
+	{
+		return this.#gameStarted;
 	}
 
 	/// Adds a player to the game
 	addPlayer(id, name, gameOwner)
 	{
-		if(this.gameStarted)
+		if(this.#gameStarted)
 			throw Error("Game already started");
 
-		gameStarted = false
 		// TODO: prevent in-progress joining
 		// TODO: limit to max-players
 		this.#players[id] = {
@@ -41,7 +44,7 @@ export default class Game
 	/// Deals all cards + numJokers to all players, starting with the given dealer (or by randomly choosing a dealer)
 	deal(numJokers, dealerPlayerId = null)
 	{
-		if(this.gameStarted)
+		if(this.#gameStarted)
 			throw Error("Game already started");
 
 		// TODO: prevent double dealing
@@ -49,7 +52,7 @@ export default class Game
 		this.#chooseDealer(dealerPlayerId);
 		this.#dealDeck(deck, dealerPlayerId);
 		let playersHands = this.#getPlayersHands();
-		this.gameStarted = true;
+		this.#gameStarted = true;
 		return Promise.resolve(playersHands);
 	}
 
@@ -97,7 +100,6 @@ export default class Game
 	/// Deals the given deck to all players
 	#dealDeck(deck)
 	{
-		gameStarted = true
 		let playersArray = Object.values(this.#players)
 		let p = this.#currentPlayerIndex;
 
@@ -131,7 +133,7 @@ export default class Game
 						cards: player.cards,
 						currentPlayer: this.#currentPlayerIndex == i,
 						gameOwnerButton: player.gameOwner,
-						gameStarted, gameStarted
+						gameStarted: this.#gameStarted
 					};
 					// your own hand, but not the game owner
 				else if (player.id == playersArray[p].id)
@@ -164,7 +166,7 @@ export default class Game
 	/// Plays a hand into the game
 	playHand(playerId, cards)
 	{
-		if(!this.gameStarted)
+		if(!this.#gameStarted)
 			throw Error("Game not started");
 
 		let player = this.#players[playerId];
