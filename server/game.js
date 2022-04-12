@@ -9,16 +9,22 @@ export default class Game
 	#players = {}
 	#playedHands = [];
 	#currentPlayerIndex = null;
+	gameStarted = false;
 
 	constructor(name, id)
 	{
 		this.#name = name;
 		this.#id = id;
+		
+		this.gameStarted = false;
 	}
 
 	/// Adds a player to the game
 	addPlayer(id, name, gameOwner)
 	{
+		if(this.gameStarted)
+			throw Error("Game already started");
+
 		gameStarted = false
 		// TODO: prevent in-progress joining
 		// TODO: limit to max-players
@@ -35,11 +41,15 @@ export default class Game
 	/// Deals all cards + numJokers to all players, starting with the given dealer (or by randomly choosing a dealer)
 	deal(numJokers, dealerPlayerId = null)
 	{
+		if(this.gameStarted)
+			throw Error("Game already started");
+
 		// TODO: prevent double dealing
 		let deck = this.#buildDeck(numJokers);
 		this.#chooseDealer(dealerPlayerId);
 		this.#dealDeck(deck, dealerPlayerId);
 		let playersHands = this.#getPlayersHands();
+		this.gameStarted = true;
 		return Promise.resolve(playersHands);
 	}
 
@@ -154,6 +164,9 @@ export default class Game
 	/// Plays a hand into the game
 	playHand(playerId, cards)
 	{
+		if(!this.gameStarted)
+			throw Error("Game not started");
+
 		let player = this.#players[playerId];
 		
 		for(var c = 0; c < cards.length; c++)

@@ -79,11 +79,9 @@ export default class ClientController
 		catch(e)
 		{
 			if(e.error == "game-doesnt-exist")
-			{
 				this.#bus.publish('error-occurred', `Game ${gameId} does not exist`);
-			}
-
-			// TODO: handle game in progress
+			else if(e.error == "game-already-started")		
+				this.#bus.publish('error-occurred', `Game ${gameId} already stated`);
 		}
 	}
 

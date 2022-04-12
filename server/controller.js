@@ -28,12 +28,19 @@ export default class Controller
 				return;
 	
 			case 'join':
-				// todo: validate game hasnt started
 
 				if(!this.#games[data.gameId])
 				{
 					await this.#acknowledge(data.playerId, data.messageId, {
 						error: "game-doesnt-exist"
+					});
+					break;
+				}
+
+				if(this.#games[data.gameId].gameStarted)
+				{
+					await this.#acknowledge(data.playerId, data.messageId, {
+						error: "game-already-started"
 					});
 					break;
 				}
