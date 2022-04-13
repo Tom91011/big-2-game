@@ -5,7 +5,8 @@ export default class Game
 {
 	#id = null;
 	#name = null;
-	#players = {}
+	#players = {};
+	#playersArray = [];
 	#playedHands = [];
 	#currentPlayerIndex = null;
 	#gameStarted = false;
@@ -25,7 +26,8 @@ export default class Game
 
 	get currentPlayerId()
 	{
-		return this.#players[this.#currentPlayerIndex];
+		let currentPlayer = this.#playersArray[this.#currentPlayerIndex];
+		return currentPlayer.id;
 	}
 
 	/// Adds a player to the game
@@ -34,7 +36,6 @@ export default class Game
 		if(this.#gameStarted)
 			throw Error("Game already started");
 
-		// TODO: prevent in-progress joining
 		// TODO: limit to max-players
 		this.#players[id] = {
 			id,
@@ -42,6 +43,8 @@ export default class Game
 			cards: [],
 			gameOwner
 		}
+		this.#playersArray.push(this.#players[id]);
+
 		let playersHands = this.#getPlayersHands();
 		return Promise.resolve(playersHands);
 	}
@@ -89,15 +92,13 @@ export default class Game
 	/// Chooses the dealer, using either the given playerId or randomly picking a player
 	#chooseDealer(dealerPlayerId = null)
 	{
-		let playersArray = Object.values(this.#players)
-
 		this.#currentPlayerIndex = null;
 		if(!dealerPlayerId)
-			this.#currentPlayerIndex = Math.floor(Math.random() * playersArray.length)
+			this.#currentPlayerIndex = Math.floor(Math.random() * this.#playersArray.length)
 		else
 		{
-			this.#currentPlayerIndex = playersArray.findIndex(player => player.id == dealerPlayerId) + 1;
-			if(this.#currentPlayerIndex == playersArray.length)
+			this.#currentPlayerIndex = this.#playersArray.findIndex(player => player.id == dealerPlayerId) + 1;
+			if(this.#currentPlayerIndex == this.#playersArray.length)
 				this.#currentPlayerIndex = 0;
 		}
 	}
@@ -179,7 +180,7 @@ export default class Game
 		if(!player)
 			throw Error(`Player ${playerId} does not exist`);
 
-		if(playerId != this.#players[this.currentPlayerIndex].id)
+		if(playerId != this.currentPlayerId)
 			throw Error(`Player ${playerId} is not the current player`);
 
 		for(var c = 0; c < cards.length; c++)
@@ -196,8 +197,8 @@ export default class Game
 		this.#playedHands.push(playedHand);
 
 		this.#currentPlayerIndex++;
-		if(this.#currentPlayerIndex == Object.keys(this.#players).length)
-			this.#currentPlayerIndex == 0
+		if(this.#currentPlayerIndex == this.#playersArray.length)
+			this.#currentPlayerIndex = 0;
 
 		let playersHands = this.#getPlayersHands();
 
