@@ -17,8 +17,7 @@ export default class View
 
 		$container.querySelector('button.js-join-game').addEventListener('click', e => {
 			e.preventDefault();
-			this.#bus.publish('join-game', $container.querySelector('input[name=game-id]').value, this.$playerName.value
-			);
+			this.#bus.publish('join-game', $container.querySelector('input[name=game-id]').value, this.$playerName.value);
 		}, false);
 
 		this.$playerName = $container.querySelector('#txtLobbyPlayerName')
@@ -35,6 +34,15 @@ export default class View
 		this.$table = $container.querySelector('.js-table')
 
 		this.$txtNumJokers = $container.querySelector('input[name=num-jokers]');
+
+		this.$frmDeal = $container.querySelector('form.js-deal');
+		this.$frmDeal.addEventListener('submit', e => {
+			e.preventDefault();
+			
+			let $txtNumJokers = this.$frmDeal.querySelector('input[name="num-jokers"]')
+			const numJokers = parseInt($txtNumJokers.value, 10);
+			this.#bus.publish('deal', numJokers);
+		}, false);
 
 		this.$btnPlayHand = $container.querySelector('.js-play');
 		this.$btnPlayHand.addEventListener('click', e => {
@@ -54,44 +62,34 @@ export default class View
 
 	#initBus()
 	{
-		this.#bus.subscribe('game-created', game => this.#gameStarted(game));
-		this.#bus.subscribe('game-joined', game => this.#gameStarted(game));
+		this.#bus.subscribe('game-created', game => this.#gameJoined(game));
+		this.#bus.subscribe('game-joined', game => this.#gameJoined(game));
+		this.#bus.subscribe('game-started', () => this.#gameStarted());
 		this.#bus.subscribe('hand-played', hand => this.#handPlayed(hand));
-		this.#bus.subscribe('hands-updated', (hands, gameStarted) => this.#handsUpdated(hands, gameStarted));
+		this.#bus.subscribe('hands-updated', hands => this.#handsUpdated(hands));
 
 		this.#bus.subscribe('error-occurred', message => alert(message));
 	}
 
-	#gameStarted(game)
+	#gameJoined(game)
 	{
 		this.$lobby.classList.add('d-none');
 		this.$gameTable.classList.remove('d-none');
 		this.$gameId.textContent = game.id;
 	}
 
-	#addPlayer(hand, gameStarted)
+	#gameStarted()
 	{
-		const $container = document
+		this.$frmDeal.classList.add('d-none');
+	}
+
+	#addPlayer(hand)
+	{
 		var $player = this.$playerRowTemplate.cloneNode(true);
 		$player.querySelector('.js-id').textContent = hand.playerId;
 		this.#playerRows[hand.playerId] = $player;
 		$player.querySelector('.js-name').textContent = hand.playerName;
 		this.$playerTableBody.appendChild($player);
-		
-		if(!hand.gameOwnerButton)
-		{
-		$player.querySelector('.js-owner').classList.add('d-none')
-		}
-
-		$container.querySelector('.js-deal').addEventListener('click', e => {
-			e.preventDefault();	
-			if(hand.gameOwnerButton)
-			{
-				this.$txtNumJokers = $player.querySelector('.num-jokers')
-				const numJokers = parseInt(this.$txtNumJokers.value, 10);
-				this.#bus.publish('deal', numJokers, gameStarted);
-			}
-		}, false);
 	}
 
 	#setCurrentPlayer(currentPlayerId)
@@ -106,19 +104,16 @@ export default class View
 		this.$btnPlayHand.disabled = !weAreCurrentPlayer;
 	}
 
-	#handsUpdated(hands, gameStarted)
+	#handsUpdated(hands)
 	{
 		for(var h = 0; h < hands.length; h++)
-				this.#updatePlayer(hands[h], gameStarted)					
+			this.#updatePlayer(hands[h])					
 	}
 
-	#updatePlayer(hand, gameStarted)
+	#updatePlayer(hand)
 	{
-		if(hand.gameStarted)
-			document.querySelector('.js-owner').classList.add('d-none')
-		
 		if(!this.#playerRows[hand.playerId])
-			this.#addPlayer(hand, gameStarted);
+			this.#addPlayer(hand);
 
 		if(hand.playerId == this.#playerId)
 		{
@@ -163,7 +158,7 @@ export default class View
 		let $cards = document.createElement('div');
 		$cards.classList.add('cards');
 		$hand.appendChild($cards);
-		
+
 		let randomAngle = Math.floor(Math.random() * 20) - 10;
 		$cards.style.transform = `rotate(${randomAngle}deg) translateX(-50%)`;
 

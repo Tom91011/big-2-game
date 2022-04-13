@@ -23,7 +23,7 @@ export default class Controller
 			case 'create':
 				let game = await this.#createGame(data.gameName);
 				await this.#acknowledge(data.playerId, data.messageId, { gameId: game.id});
-				var playersHands = await this.#addPlayer(game.id, data.playerId, data.playerName, data.gameOwner, Game.gameStarted);
+				var playersHands = await this.#addPlayer(game.id, data.playerId, data.playerName, data.gameOwner);
 				this.updateAllPlayersHands(playersHands);
 				return;
 	
@@ -92,11 +92,12 @@ export default class Controller
 	}
 
 	/// Deals the decks to all players
-	async #deal(gameId, numJokers, dealerPlayerId = null, gameStarted)
+	async #deal(gameId, numJokers, dealerPlayerId = null)
 	{
 		let game = this.#games[gameId];
-		let playersHands = await game.deal(numJokers, dealerPlayerId, gameStarted);
-		this.updateAllPlayersHands(playersHands, gameStarted);
+		let playersHands = await game.deal(numJokers, dealerPlayerId);
+		this.#notifyPlayers({ type: 'game-started' });
+		this.updateAllPlayersHands(playersHands);
 	}
 
 	async updateAllPlayersHands(playersHands)
