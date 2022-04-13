@@ -160,12 +160,19 @@ export default class View
 		let $hand = document.createElement('div');
 		$hand.classList.add('hand');
 
+		let $cards = document.createElement('div');
+		$cards.classList.add('cards');
+		$hand.appendChild($cards);
+		
+		let randomAngle = Math.floor(Math.random() * 20) - 10;
+		$cards.style.transform = `rotate(${randomAngle}deg) translateX(-50%)`;
+
 		for(let i = 0; i < hand.cards.length; i++)
 		{
 			let $card = document.createElement('img');
 			$card.classList.add('card');
 			$card.src = this.#getCardImageUrl(hand.cards[i]);
-			$hand.appendChild($card);
+			$cards.appendChild($card);
 		}
 		this.$table.appendChild($hand);
 	}

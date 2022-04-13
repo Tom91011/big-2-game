@@ -56,7 +56,7 @@ export default class Controller
 				break;
 
 			case 'play-hand':
-				await this.#playHand(data.gameId, data.playerId, data.cards);
+				await this.#playHand(data.gameId, data.playerId, data.cards, data.messageId);
 
 		}
 	}
@@ -112,7 +112,7 @@ export default class Controller
 	}
 
 	/// Handles a player playing a hand
-	async #playHand(gameId, playerId, cards)
+	async #playHand(gameId, playerId, cards, messageId)
 	{
 		let game = this.#games[gameId];
 
@@ -129,12 +129,12 @@ export default class Controller
 			// update all players' hands'
 			this.updateAllPlayersHands(result.playersHands);
 
-			await this.#acknowledge(data.playerId, data.messageId);
+			await this.#acknowledge(playerId, messageId);
 
 		}
 		else
 		{
-			await this.#acknowledge(data.playerId, data.messageId, { error: "not-current-player" });
+			await this.#acknowledge(playerId, messageId, { error: "not-current-player" });
 		}
 	}
 
