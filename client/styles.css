@@ -1,0 +1,37 @@
+.table
+{
+
+}
+
+.table .hand
+{
+	position: absolute;
+	left: auto;
+	right: auto;
+	padding: 20px;
+}
+
+.table .hand .card
+{
+	width: 100px;
+	margin: 0 10px;
+	transform-origin: bottom center;
+}
+
+
+.table .hand .card:nth-child(1)
+{
+	transform: rotate(-10deg);
+}
+.table .hand .card:nth-child(2)
+{
+	transform: rotate(-5deg);
+}
+.table .hand .card:nth-child(4)
+{
+	transform: rotate(5deg);
+}
+.table .hand .card:nth-child(5)
+{
+	transform: rotate(10deg);
+}

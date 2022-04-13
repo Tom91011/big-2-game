@@ -157,6 +157,35 @@ export default class View
 
 	#handPlayed(hand)
 	{
-		this.$table.textContent = hand.cards.join(', ');
+		let $hand = document.createElement('div');
+		$hand.classList.add('hand');
+
+		for(let i = 0; i < hand.cards.length; i++)
+		{
+			let $card = document.createElement('img');
+			$card.classList.add('card');
+			$card.src = this.#getCardImageUrl(hand.cards[i]);
+			$hand.appendChild($card);
+		}
+		this.$table.appendChild($hand);
+	}
+
+	#getCardImageUrl(card)
+	{
+		let value = card.substr(0, card.length - 1);
+		let suit = card.substr(card.length - 1, 1);
+
+		value = value == 'K' ? 'king' 
+				: value == 'Q' ? 'queen' 
+				: value == 'J' ? 'jack'
+				: value == 'A' ? 'ace'
+				: value;
+
+		suit = suit == 'D' ? 'diamonds'
+				: suit == 'C' ? 'clubs'
+				: suit == 'H' ? 'hearts'
+				: 'spades';
+
+		return '/cards/' + value + '_of_' + suit + '.png';
 	}
 }
