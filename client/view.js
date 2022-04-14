@@ -57,7 +57,13 @@ export default class View
 			if(cards.length == 0)
 				this.#bus.publish('error-occurred', 'Can\'t play 0 cards. Did you mean to pass instead?');
 			else
-				this.#bus.publish('play-hand', cards)
+      {
+        let validationResult = this.#validateHand(cards);
+  			if(validationResult.valid)
+  				this.#bus.publish('play-hand', cards)
+  			else
+  				this.#bus.publish('error-occurred', validationResult.error);
+      }
 		}, false);
 
 		this.$btnPass = $container.querySelector('.js-pass');
@@ -82,20 +88,34 @@ export default class View
 		{
 			// must contain 3D
 			if(!cards.indexOf('3D') == -1)
-				return false;
+			{
+				return {
+					valid: false,
+					error: 'First hand must contain 3D'
+				};
+			}
 		}
+
+		// TODO: dont allow passing on first hand (of a round)
 
 		// this is not the first hand (of a round)
 		if(!this.#lastPlayedHand.roundOver)
 		{
 			// must play the same number of cards as the last hand
 			if(cards.length != this.#lastPlayedHand.cards.length)
-				return false;
+			{
+				return {
+					valid: false,
+					error: 'You must play the same number of cards as the previous hand'
+				};
+			}
 		}
 
 		// TODO: validate its a valid hand
 		// TODO: validate it beats the previous hand
-		return true;
+		return {
+			valid: true
+		};
 	}
 
 	#initBus()

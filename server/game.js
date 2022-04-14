@@ -195,7 +195,7 @@ export default class Game
 				player.cards.splice(cardIndex, 1)
 		}
 		
-		let roundOver = this.#everyoneHasPassed();
+		let roundOver = this.getRoundOver();
 
 		let playedHand = {
 			playerId,
@@ -216,7 +216,7 @@ export default class Game
 		};
 	}
 
-	#everyoneHasPassed()
+	getRoundOver()
 	{
 		// find the last non passed hand
 		for(var i = this.#playedHands.length - 1; i >=0; i--)
@@ -228,7 +228,15 @@ export default class Game
 			}
 		}
 
+		// First hand cant be an everyone-else-passed scenario
+		if(this.#playedHands.length == 0)
+			return false;
+
+		// hack for testing, can't really have 1 player
+		if(this.#playersArray.length == 1)
+			return false;
+
 		// everyone has passed if the number of pass hands played is equal to the number of players minus one
-		return this.#playedHands[i].cards.length - i == this.playersArray.length - 1;
+		return this.#playedHands.length - i == this.#playersArray.length - 1;
 	}
 }
