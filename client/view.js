@@ -3,8 +3,11 @@ export default class View
 	#bus = null;
 	#playerRows = {};
 	#playerId = null;
+	#handsPlayed = 0;
 	#lastPlayedHand = {
-		cards: []
+		playerId: null,
+		cards: [],
+		roundOver: true
 	};
 
 	constructor($container, bus, playerId)
@@ -74,17 +77,25 @@ export default class View
 
 	#validateHand(cards)
 	{
-		// this is the first hand
-		if(this.#lastPlayedHand.cards.length == 0)
+		// if its the first hand
+		if(this.#handsPlayed == 0)
 		{
 			// must contain 3D
 			if(!cards.indexOf('3D') == -1)
 				return false;
 		}
 
-		// must play the same number of cards as the last hand
-		if(cards.length != this.#lastPlayedHand.cards.length)
-			return false;
+		// this is not the first hand (of a round)
+		if(!this.#lastPlayedHand.roundOver)
+		{
+			// must play the same number of cards as the last hand
+			if(cards.length != this.#lastPlayedHand.cards.length)
+				return false;
+		}
+
+		// TODO: validate its a valid hand
+		// TODO: validate it beats the previous hand
+		return true;
 	}
 
 	#initBus()
@@ -181,6 +192,7 @@ export default class View
 	#handPlayed(hand)
 	{
 		this.#lastPlayedHand = hand;
+		this.#handsPlayed++;
     
 		// dont do anything when it was a Pass
 		if(hand.cards.length == 0)
