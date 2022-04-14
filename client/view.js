@@ -3,6 +3,9 @@ export default class View
 	#bus = null;
 	#playerRows = {};
 	#playerId = null;
+	#lastPlayedHand = {
+		cards: []
+	};
 
 	constructor($container, bus, playerId)
 	{
@@ -67,6 +70,21 @@ export default class View
 		let $cards = [...$player.querySelectorAll('input[name=cards]:checked')];
 		let cards = $cards.map($card => $card.value);
 		return cards;
+	}
+
+	#validateHand(cards)
+	{
+		// this is the first hand
+		if(this.#lastPlayedHand.cards.length == 0)
+		{
+			// must contain 3D
+			if(!cards.indexOf('3D') == -1)
+				return false;
+		}
+
+		// must play the same number of cards as the last hand
+		if(cards.length != this.#lastPlayedHand.cards.length)
+			return false;
 	}
 
 	#initBus()
@@ -162,6 +180,8 @@ export default class View
 
 	#handPlayed(hand)
 	{
+		this.#lastPlayedHand = hand;
+    
 		// dont do anything when it was a Pass
 		if(hand.cards.length == 0)
 			return;
