@@ -5,16 +5,20 @@ export default class Game
 {
 	#id = null;
 	#name = null;
+	#ownerPlayerId = null;
+
 	#players = {};
 	#playersArray = [];
 	#playedHands = [];
 	#currentPlayerIndex = null;
 	#gameStarted = false;
 
-	constructor(name, id)
+	constructor(name, id, ownerPlayerId)
 	{
 		this.#name = name;
 		this.#id = id;
+
+		this.#ownerPlayerId = ownerPlayerId;
 		
 		this.#gameStarted = false;
 	}
@@ -28,6 +32,11 @@ export default class Game
 	{
 		let currentPlayer = this.#playersArray[this.#currentPlayerIndex];
 		return currentPlayer.id;
+	}
+
+	get ownerPlayerId()
+	{
+		return this.#ownerPlayerId;
 	}
 
 	/// Adds a player to the game
@@ -160,6 +169,7 @@ export default class Game
 		return playersHands;
 	}
 
+	/// Choose the player to go first
 	#chooseFirstPlayer()
 	{
 		// the player with 3D is first to act

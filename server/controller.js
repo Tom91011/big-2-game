@@ -21,7 +21,7 @@ export default class Controller
 		switch(data.command)
 		{
 			case 'create':
-				let game = await this.#createGame(data.gameName);
+				let game = await this.#createGame(data.gameName, data.playerId);
 				await this.#acknowledge(data.playerId, data.messageId, { gameId: game.id});
 				var playersHands = await this.#addPlayer(game.id, data.playerId, data.playerName, data.gameOwner);
 				this.updateAllPlayersHands(playersHands);
@@ -51,8 +51,7 @@ export default class Controller
 				break;
 	
 			case 'deal':
-				await this.#deal(data.gameId, data.numJokers, data.dealerPlayerId);
-				await this.#acknowledge(data.playerId, data.messageId);
+				await this.#deal(data.playerId, data.messageId, data.gameId, data.numJokers, data.dealerPlayerId);
 				break;
 
 			case 'play-hand':
@@ -67,7 +66,7 @@ export default class Controller
 	}
 
 	/// Creates a game
-	async #createGame(gameName)
+	async #createGame(gameName, playerId)
 	{
 		let gameId = this.#generateGameId();
 
@@ -77,7 +76,7 @@ export default class Controller
 		// 	return;
 		// }
 			
-		this.#games[gameId] = new Game(gameName, gameId);
+		this.#games[gameId] = new Game(gameName, gameId, playerId);
 		return {
 			id: gameId,
 			name: gameName
@@ -92,12 +91,21 @@ export default class Controller
 	}
 
 	/// Deals the decks to all players
-	async #deal(gameId, numJokers, dealerPlayerId = null)
+	async #deal(playerId, messageId, gameId, numJokers, dealerPlayerId = null)
 	{
 		let game = this.#games[gameId];
+		if(game.ownerPlayerId != playerId)
+		{
+			await this.#acknowledge(playerId, messageId, {
+				error: "invalid-dealer"
+			});
+			return;
+		}
+
 		let playersHands = await game.deal(numJokers, dealerPlayerId);
 		this.#notifyPlayers({ type: 'game-started' });
 		this.updateAllPlayersHands(playersHands);
+		await this.#acknowledge(playerId, messageId);
 	}
 
 	async updateAllPlayersHands(playersHands)

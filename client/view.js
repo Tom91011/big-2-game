@@ -121,7 +121,7 @@ export default class View
 
 	#initBus()
 	{
-		this.#bus.subscribe('game-created', game => this.#gameJoined(game));
+		this.#bus.subscribe('game-created', game => this.#gameEntered(game));
 		this.#bus.subscribe('game-joined', game => this.#gameJoined(game));
 		this.#bus.subscribe('game-started', () => this.#gameStarted());
 		this.#bus.subscribe('hand-played', hand => this.#handPlayed(hand));
@@ -131,6 +131,12 @@ export default class View
 	}
 
 	#gameJoined(game)
+	{
+		this.$frmDeal.classList.add('d-none');
+		this.#gameEntered(game);
+	}
+
+	#gameEntered(game)
 	{
 		this.$lobby.classList.add('d-none');
 		this.$gameTable.classList.remove('d-none');

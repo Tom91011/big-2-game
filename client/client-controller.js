@@ -58,14 +58,21 @@ export default class ClientController
 		
 	}
 
-	deal(numJokers)
+	async deal(numJokers)
 	{	
-		return this.#send({
-			command: 'deal',
-			playerId: this.#playerId,
-			gameId: this.#gameId,
-			numJokers
-		})
+		try
+		{
+			const ack = await this.#send({
+				command: 'deal',
+				playerId: this.#playerId,
+				gameId: this.#gameId,
+				numJokers
+			});
+		}
+		catch(e)
+		{
+			this.#bus.publish('error-occurred', e.error);
+		}
 	}
 
 	async joinGame(gameId, playerName)
