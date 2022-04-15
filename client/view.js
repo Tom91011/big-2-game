@@ -48,7 +48,16 @@ export default class View
 		this.$btnPlayHand.addEventListener('click', e => {
 			e.preventDefault();
 			let cards = this.#getSelectedCardsToPlay();
-			this.#bus.publish('play-hand', cards)
+			if(cards.length == 0)
+				this.#bus.publish('error-occurred', 'Can\'t play 0 cards. Did you mean to pass instead?');
+			else
+				this.#bus.publish('play-hand', cards)
+		}, false);
+
+		this.$btnPass = $container.querySelector('.js-pass');
+		this.$btnPass.addEventListener('click', e => {
+			e.preventDefault();
+			this.#bus.publish('play-hand', [])
 		}, false);
 	}
 
@@ -102,6 +111,7 @@ export default class View
 
 		let weAreCurrentPlayer = this.#playerId == currentPlayerId;
 		this.$btnPlayHand.disabled = !weAreCurrentPlayer;
+		this.$btnPass.disabled = !weAreCurrentPlayer;
 	}
 
 	#handsUpdated(hands)
@@ -152,6 +162,10 @@ export default class View
 
 	#handPlayed(hand)
 	{
+		// dont do anything when it was a Pass
+		if(hand.cards.length == 0)
+			return;
+
 		let $hand = document.createElement('div');
 		$hand.classList.add('hand');
 
