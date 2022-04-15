@@ -59,6 +59,7 @@ export default class Game
 		let deck = this.#buildDeck(numJokers);
 		this.#chooseDealer(dealerPlayerId);
 		this.#dealDeck(deck, dealerPlayerId);
+		this.#chooseFirstPlayer();
 		let playersHands = this.#getPlayersHands();
 		this.#gameStarted = true;
 		return Promise.resolve(playersHands);
@@ -157,6 +158,20 @@ export default class Game
 			});
 		}
 		return playersHands;
+	}
+
+	#chooseFirstPlayer()
+	{
+		// the player with 3D is first to act
+		for(let i = 0; i < this.#playersArray.length; i++)
+		{
+			if(this.#playersArray[i].cards.indexOf('3D') != -1)
+			{
+				this.#currentPlayerIndex = i;
+				return;
+			}
+		}
+		return null;
 	}
 
 	/// Plays a hand into the game
