@@ -195,14 +195,15 @@ export default class Game
 				player.cards.splice(cardIndex, 1)
 		}
 		
-		let roundOver = this.getRoundOver();
 
 		let playedHand = {
 			playerId,
 			cards,
-			roundOver
+			roundOver: null // worked out below
 		};
 		this.#playedHands.push(playedHand);
+
+		playedHand.roundOver = this.getRoundOver();
 
 		this.#currentPlayerIndex++;
 		if(this.#currentPlayerIndex == this.#playersArray.length)
