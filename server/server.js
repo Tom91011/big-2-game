@@ -12,8 +12,10 @@ app.get('/', function(req, res){
 	res.sendFile(path.resolve('client/view.html'));
 }); 
 
+const server = app.listen(process.env.PORT || 3000);
+
 // Websocket server for game interaction
-const wss = new WebSocketServer({ port: 8080 });
+const wss = new WebSocketServer({ server });
 let controller = new Controller();
 
 wss.on('connection', function connection(ws) {
@@ -24,4 +26,3 @@ wss.on('connection', function connection(ws) {
 });
 
 
-app.listen(process.env.PORT || 3000);
