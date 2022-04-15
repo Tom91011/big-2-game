@@ -2,7 +2,7 @@ import ClientController from './client-controller.js'
 import View from './view.js';
 import bus from './bus.js';// '@trullock/pubsub';
 
-var HOST = location.origin.replace(/^https?/, 'ws')
+var HOST = location.origin.replace(/^http/, 'ws')
 var socket = new WebSocket(HOST);
 
 let playerId = new Date().getTime();
