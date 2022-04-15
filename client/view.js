@@ -55,15 +55,16 @@ export default class View
 			e.preventDefault();
 			let cards = this.#getSelectedCardsToPlay();
 			if(cards.length == 0)
+			{
 				this.#bus.publish('error-occurred', 'Can\'t play 0 cards. Did you mean to pass instead?');
-			else
-      {
-        let validationResult = this.#validateHand(cards);
-  			if(validationResult.valid)
-  				this.#bus.publish('play-hand', cards)
-  			else
-  				this.#bus.publish('error-occurred', validationResult.error);
-      }
+				return;
+			}
+
+			let validationResult = this.#validateHand(cards);
+				if(validationResult.valid)
+					this.#bus.publish('play-hand', cards)
+				else
+					this.#bus.publish('error-occurred', validationResult.error);
 		}, false);
 
 		this.$btnPass = $container.querySelector('.js-pass');
