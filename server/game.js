@@ -198,6 +198,15 @@ export default class Game
 		if(playerId != this.currentPlayerId)
 			throw Error(`Player ${playerId} is not the current player`);
 
+		if(cards.length == 0)
+		{
+			if(this.#playedHands.length == 0)
+				throw Error(`Can't pass the first hand of a game`);
+
+			if(this.#playedHands[this.#playedHands.length - 1].roundOver)
+				throw Error(`Can't pass the first hand of a new round`);
+		}
+
 		for(var c = 0; c < cards.length; c++)
 		{
 			let cardIndex = player.cards.findIndex(card => card == cards[c]);

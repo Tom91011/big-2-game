@@ -1,3 +1,5 @@
+import Big2Validation from "./common/big2-validation.js";
+
 export default class View
 {
 	#bus = null;
@@ -9,12 +11,15 @@ export default class View
 		cards: [],
 		roundOver: true
 	};
+	#validation = null;
 
 	constructor($container, bus, playerId)
 	{
 		this.#bus = bus;
 		this.#initBus();
 		this.#playerId = playerId;
+
+		this.#validation = new Big2Validation();
 
 		$container.querySelector('button.js-create-game').addEventListener('click', e => {
 			e.preventDefault();
@@ -54,15 +59,16 @@ export default class View
 		this.$btnPlayHand.addEventListener('click', e => {
 			e.preventDefault();
 			let cards = this.#getSelectedCardsToPlay();
-			if(cards.length == 0)
+			let validationResult = this.#validation.isLegalHand(cards);
+			if(validationResult.errors != 0)
 			{
-				this.#bus.publish('error-occurred', 'Can\'t play 0 cards. Did you mean to pass instead?');
+				this.#bus.publish('error-occurred', validationResult.errors[0]);
 				return;
 			}
 
-			let validationResult = this.#validateHand(cards);
+			validationResult = this.#validateHand(cards);
 				if(validationResult.valid)
-					this.#bus.publish('play-hand', cards)
+					this.#bus.publish('play-hand', cards);
 				else
 					this.#bus.publish('error-occurred', validationResult.error);
 		}, false);
@@ -70,7 +76,14 @@ export default class View
 		this.$btnPass = $container.querySelector('.js-pass');
 		this.$btnPass.addEventListener('click', e => {
 			e.preventDefault();
-			this.#bus.publish('play-hand', [])
+
+			if(this.#handPlayed == 0)
+				this.#bus.publish('error-occurred', "Can't pass the first hand of a game");
+			else if(this.#lastPlayedHand.roundOver)
+				this.#bus.publish('error-occurred', "Can't pass the first hand of a round");
+			else
+				this.#bus.publish('play-hand', []);
+
 		}, false);
 	}
 

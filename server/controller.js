@@ -127,19 +127,24 @@ export default class Controller
 
 		if(game.currentPlayerId == playerId)
 		{
-			let result = game.playHand(playerId, cards);
+			try
+			{
+				let result = game.playHand(playerId, cards);
+				// let everyone know what was played
+				this.#notifyPlayers({
+					type: 'hand-played',
+					payload: result.playedHand
+				});
 
-			// let everyone know what was played
-			this.#notifyPlayers({
-				type: 'hand-played',
-				payload: result.playedHand
-			});
+				// update all players' hands'
+				this.updateAllPlayersHands(result.playersHands);
 
-			// update all players' hands'
-			this.updateAllPlayersHands(result.playersHands);
-
-			await this.#acknowledge(playerId, messageId);
-
+				await this.#acknowledge(playerId, messageId);
+			} 
+			catch(e)
+			{
+				await this.#acknowledge(playerId, messageId, { error: e.message });
+			}
 		}
 		else
 		{
